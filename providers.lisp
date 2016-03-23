@@ -14,6 +14,7 @@
     (:string "google"
      :endpoints-url
      "https://accounts.google.com/.well-known/openid-configuration"
+     :auth-scope "openid profile email"
      :token-processor #'google-token-processor)))
 
 (defparameter *provider-secrets* nil)

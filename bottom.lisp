@@ -10,9 +10,9 @@
 (defun discover-endpoints (discovery-url)
   (let ((disc (cl-json:decode-json-from-string (drakma:http-request discovery-url))))
     (list
-     :auth-endpoint (gethash "authorization_endpoint" disc)
-     :token-endpoint (gethash "token_endpoint" disc)
-     :userinfo-endpoint (gethash "userinfo_endpoint" disc))))
+     :auth-endpoint (assoc-cdr :authorization--endpoint disc)
+     :token-endpoint (assoc-cdr :token--endpoint disc)
+     :userinfo-endpoint (assoc-cdr :userinfo--endpoint disc))))
 
 ;;;FIXME: Endpoint discovery only done on startup. Should look at spec and see if it should
 ;;;happen more frequently.
@@ -20,9 +20,10 @@
   (let ((prov (getf *provider-info* provider)))
     (unless prov (error "Not a recognized provider"))
     (if (getf prov :auth-endpoint)
-        (extract-keywords
-         '(:auth-endpoint :token-endpoint :userinfo-endpoint)
-         prov)
+        (alexandria:alist-plist
+         (extract-keywords
+          '(:auth-endpoint :token-endpoint :userinfo-endpoint :auth-scope)
+          prov))
         (progn
           (unless (getf prov :endpoints-url)
             (error "Provider must have :endpoints-url or endpoint definitions"))
@@ -64,15 +65,17 @@
     (&key auth-scope client-id auth-endpoint state redirect-uri &allow-other-keys)
   (drakma:http-request
    auth-endpoint :redirect nil
-   :parameters `(("client_id" . ,cliend-id) ("app_id" . ,client-id)
-                 ("response_type" . "code") ("scope" . ,auth-scope)
-                 ("redirect_uri" . ,redirect-uri) ("state" . ,state))))
+   :parameters (print `(("client_id" . ,client-id) ("app_id" . ,client-id)
+                  ("response_type" . "code") ("scope" . ,auth-scope)
+                  ("redirect_uri" . ,redirect-uri) ("state" . ,state)))))
 
 ;;;WARNING: Function saves state to session!
 (defun login-action (provider)
+  (unless (ningle:context :session)
+    (setf (ningle:context :session) (make-hash-table)))
   (let ((state (gen-state 36)))
-    (setf (gethash 'state *session*) state)
-    (setf (gethash :oid-connect-provider *session*) provider)
+    (setf (gethash 'state (ningle:context :session)) state)
+    (setf (gethash :oid-connect-provider (ningle:context :session)) provider)
     (multiple-value-bind (content resp-code headers uri)
         (apply #'request-user-auth-destination :state state
                :redirect-uri (make-callback-url provider)
@@ -107,10 +110,10 @@
                                       ("access_token" . ,access-token)))))
 
 (defun valid-state (received-state)
-  (equal (gethash 'state *session*) received-state))
+  (equal (gethash 'state (ningle:context :session)) received-state))
 
 (defun destination-on-login ()
-  (aif (gethash :oid-connect-destination *session*)
+  (aif (gethash :oid-connect-destination (ningle:context :session))
        it
        "/"))
 
@@ -122,18 +125,18 @@
           (request-access-token
            provider (assoc-cdr "code" parameters #'equal) (make-callback-url provider))
         (with-keys (:oid-connect-access-token :oid-connect-userinfo :oid-connect-id-token)
-            *session*
+            (ningle:context :session)
           (setf oid-connect-access-token access-token
                 oid-connect-userinfo (request-user-info provider access-token)
                 oid-connect-id-token id-token))
         '(302 (:location (destination-on-login))))))
 
 (defun logout-action ()
-  (remhash 'state *session*)
-  (remhash :oid-connect-provider *session*)
-  (remhash :oid-connect-access-token *session*)
-  (remhash :oid-connect-userinfo *session*)
-  (remhash :oid-connect-connect-id-token *session*))
+  (remhash 'state (ningle:context :session))
+  (remhash :oid-connect-provider (ningle:context :session))
+  (remhash :oid-connect-access-token (ningle:context :session))
+  (remhash :oid-connect-userinfo (ningle:context :session))
+  (remhash :oid-connect-connect-id-token (ningle:context :session)))
 
 
 

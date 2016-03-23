@@ -2,7 +2,8 @@
 
 (defpackage #:clack-openid-connect
   (:use #:cl #:cl-who #:anaphora)
-  (:import-from #:ningle #:*session*)
+  (:import-from #:cl-hash-util
+                #:with-keys)
   (:export
    #:*callback-extension*
    #:*login-extension*
