@@ -29,8 +29,7 @@
             (error "Provider must have :endpoints-url or endpoint definitions"))
           (let ((res (discover-endpoints (getf prov :endpoints-url))))
              (setf (getf *provider-info* provider)
-                   (concatenate 'list prov res))
-             res)))))
+                   (concatenate 'list prov res)))))))
 
 (defun provider-secrets (provider)
   (getf *provider-secrets* provider))
@@ -110,7 +109,8 @@
                                       ("access_token" . ,access-token)))))
 
 (defun valid-state (received-state)
-  (equal (gethash 'state (ningle:context :session)) received-state))
+  (and (ningle:context :session)
+       (equal (gethash 'state (ningle:context :session)) received-state)))
 
 (defun destination-on-login ()
   (aif (gethash :oid-connect-destination (ningle:context :session))

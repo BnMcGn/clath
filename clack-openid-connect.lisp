@@ -68,8 +68,9 @@ login manager is developed.
   (with-html-output-to-string (s)
     (:html
      (:head (:title "Logged in"))
-     (:body (:h1 (format nil "~a is logged in"
-                         (gethash :username (ningle:context :session))))))))
+     (:body
+      (:h1 (str (format nil "~a is logged in"
+                      (gethash :username (ningle:context :session)))))))))
 
 (defun logout-url ()
   (concatenate 'string *server-url* *openid-app-address* *logout-extension*))
@@ -84,6 +85,8 @@ login manager is developed.
 
 (defun logged-in ()
   (let ((uinfo (gethash :oid-connect-userinfo (ningle:context :session))))
+    (print "Userinfo")
+    (print uinfo)
     (setf (gethash :username (ningle:context :session))
           (aand (assoc "email" uinfo :test #'equal) (cdr it)))
     (setf (gethash :display-name (ningle:context :session))
