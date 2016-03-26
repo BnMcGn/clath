@@ -117,7 +117,7 @@
        it
        "/"))
 
-(defun callback-action (provider parameters)
+(defun callback-action (provider parameters &optional post-func)
   ;;Can we check state yet?
   (if (not (valid-state (assoc-cdr "state" parameters #'equal)))
       '(403 '() "Out, vile imposter!")
@@ -129,6 +129,7 @@
           (setf oid-connect-access-token access-token
                 oid-connect-userinfo (request-user-info provider access-token)
                 oid-connect-id-token id-token))
+        (when (functionp post-func) (funcall post-func))
         '(302 (:location (destination-on-login))))))
 
 (defun logout-action ()

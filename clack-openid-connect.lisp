@@ -29,9 +29,7 @@ login manager is developed.
         (setf (ningle:route app (concatenate 'string "/" *callback-extension* name)
                :method :get)
               (lambda (params)
-                (callback-action pr params)
-                (logged-in)
-                (logged-in-page)))))
+                (callback-action pr params #'logged-in)))))
     (setf (ningle:route app (concatenate 'string "/" *logout-extension*)
                         :method :get)
           #'logout-page)
@@ -64,6 +62,7 @@ login manager is developed.
      (:body (:h1 "Choose a login provider")
             (login-links)))))
 
+;;;FIXME: Not in use. Remove.
 (defun logged-in-page ()
   (with-html-output-to-string (s)
     (:html
