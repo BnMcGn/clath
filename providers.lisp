@@ -1,7 +1,7 @@
 (in-package :clack-openid-connect)
 
 (defparameter *provider-info*
-  '(
+  `(
     :facebook
     (:string "facebook"
      :auth-endpoint "https://www.facebook.com/dialog/oauth"
@@ -9,13 +9,13 @@
      :userinfo-endpoint "https://graph.facebook.com/v2.3/me"
      :auth-scope "email"
      :redirect-uri
-     :token-processor #'default-token-processor)
+     :token-processor ,(function default-token-processor))
     :google
     (:string "google"
      :endpoints-url
      "https://accounts.google.com/.well-known/openid-configuration"
      :auth-scope "openid profile email"
-     :token-processor #'google-token-processor)))
+     :token-processor ,(function google-token-processor))))
 
 (defparameter *provider-secrets* nil)
 

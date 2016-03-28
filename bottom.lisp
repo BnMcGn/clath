@@ -22,7 +22,8 @@
     (if (getf prov :auth-endpoint)
         (alexandria:alist-plist
          (extract-keywords
-          '(:auth-endpoint :token-endpoint :userinfo-endpoint :auth-scope)
+          '(:auth-endpoint :token-endpoint :userinfo-endpoint :auth-scope
+            :token-processor)
           prov))
         (progn
           (unless (getf prov :endpoints-url)
@@ -64,9 +65,9 @@
     (&key auth-scope client-id auth-endpoint state redirect-uri &allow-other-keys)
   (drakma:http-request
    auth-endpoint :redirect nil
-   :parameters (print `(("client_id" . ,client-id) ("app_id" . ,client-id)
-                  ("response_type" . "code") ("scope" . ,auth-scope)
-                  ("redirect_uri" . ,redirect-uri) ("state" . ,state)))))
+   :parameters `(("client_id" . ,client-id) ("app_id" . ,client-id)
+                 ("response_type" . "code") ("scope" . ,auth-scope)
+                 ("redirect_uri" . ,redirect-uri) ("state" . ,state))))
 
 ;;;WARNING: Function saves state to session!
 (defun login-action (provider)
@@ -87,19 +88,20 @@
 ;;;FIXME: Why does this need redirect_uri? Try without.
 (defun request-access-token (provider code redirect-uri)
   (let ((info (provider-info provider))
-        (secrets (provider-secret)))
+        (secrets (provider-secrets provider)))
     (funcall
      (getf info :token-processor)
      (cl-json:decode-json-from-string
-      (drakma:http-request (getf :token-endpoint info)
-                           :method :post
-                           :redirect nil
-                           :parameters `(("code" . ,code)
-                                         ("client_id" . ,(getf :client-id secrets))
-                                         ("app_id" . ,(getf :client-id secrets))
-                                         ("client_secret" . ,(getf :secret secrets))
-                                         ("redirect_uri" . ,redirect-uri)
-                                         ("grant_type" . "authorization_code")))))))
+      (drakma:http-request
+       (getf info :token-endpoint)
+       :method :post
+       :redirect nil
+       :parameters `(("code" . ,code)
+                     ("client_id" . ,(getf secrets :client-id))
+                     ("app_id" . ,(getf secrets :client-id))
+                     ("client_secret" . ,(getf secrets :secret))
+                     ("redirect_uri" . ,redirect-uri)
+                     ("grant_type" . "authorization_code")))))))
 
 (defun request-user-info (provider access-token)
   ;;FIXME: Doesn't handle failure
@@ -130,7 +132,7 @@
                 oid-connect-userinfo (request-user-info provider access-token)
                 oid-connect-id-token id-token))
         (when (functionp post-func) (funcall post-func))
-        '(302 (:location (destination-on-login))))))
+        `(302 (:location (destination-on-login))))))
 
 (defun logout-action ()
   (remhash 'state (ningle:context :session))
