@@ -132,7 +132,7 @@
                 oid-connect-userinfo (request-user-info provider access-token)
                 oid-connect-id-token id-token))
         (when (functionp post-func) (funcall post-func))
-        `(302 (:location (destination-on-login))))))
+        `(302 (:location ,(destination-on-login))))))
 
 (defun logout-action ()
   (remhash 'state (ningle:context :session))

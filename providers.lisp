@@ -23,12 +23,13 @@
 ;;; the access token, and the id token. Providers vary about what this means. Facebook,
 ;;; for example, uses the access-token as the id-token, whereas Google does something else.
 
-(defun default-token-processor (parameters)
-  (let ((access-token (cdr (assoc :access--token parameters))))
-    (values access-token access-token)))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun default-token-processor (parameters)
+    (let ((access-token (cdr (assoc :access--token parameters))))
+      (values access-token access-token)))
 
-(defun google-token-processor (parameters)
-  (values (cdr (assoc :access--token parameters))
-          (cljwt:decode
-           (cdr (assoc :id--token parameters))
-           :fail-if-unsupported nil)))
+  (defun google-token-processor (parameters)
+    (values (cdr (assoc :access--token parameters))
+            (cljwt:decode
+             (cdr (assoc :id--token parameters))
+             :fail-if-unsupported nil))))
