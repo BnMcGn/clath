@@ -122,7 +122,7 @@
 (defun callback-action (provider parameters &optional post-func)
   ;;Can we check state yet?
   (if (not (valid-state (assoc-cdr "state" parameters #'equal)))
-      '(403 '() "Out, vile imposter!")
+      '(403 '() "Login failed. State mismatch.")
       (multiple-value-bind (access-token id-token)
           (request-access-token
            provider (assoc-cdr "code" parameters #'equal) (make-callback-url provider))

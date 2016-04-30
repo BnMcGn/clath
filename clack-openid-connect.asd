@@ -13,7 +13,8 @@
                #:cljwt
                #:cl-who
                #:ubiquitous
-               #:anaphora)
+               #:anaphora
+               #:webhax)
   :serial t
   :components ((:file "package")
                (:file "util")

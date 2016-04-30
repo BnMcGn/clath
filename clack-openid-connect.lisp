@@ -7,7 +7,7 @@ login manager is developed.
 
 |#
 
-(defvar *openid-app-address* "openid_connect/")
+(defparameter *openid-app-address* "/oid_connect")
 (defparameter *logout-extension* "logout/")
 
 ;;;FIXME: *server-url* can't be dynamically set with let, because functions are not
@@ -15,7 +15,7 @@ login manager is developed.
 ;;; *server-url* is setf instead, so further instances of openid-app will stomp it.
 ;;; Single use only for now.
 
-(defun app (base-url)
+(defun login-app (base-url)
   (setf *server-url* base-url)
   (initialize-secrets)
   (let ((app (make-instance 'ningle:<app>)))
@@ -26,7 +26,8 @@ login manager is developed.
               (lambda (params)
                 (declare (ignore params))
                 (login-action pr)))
-        (setf (ningle:route app (concatenate 'string "/" *callback-extension* name)
+        (setf (ningle:route
+               app (concatenate 'string "/" *callback-extension* name)
                :method :get)
               (lambda (params)
                 (callback-action pr params #'logged-in)))))
@@ -34,6 +35,20 @@ login manager is developed.
                         :method :get)
           #'logout-page)
     app))
+
+(defun component (base-url)
+  (lambda (app)
+    (let ((lapp (lack.component:to-app (login-app base-url))))
+      (lambda (env)
+        (let ((extension
+               (webhax:under-path-p
+                *openid-app-address* (getf env :path-info))))
+          (if extension
+              (funcall lapp (webhax:repath-clack-env env extension))
+              (let ((res (funcall app env)))
+                (if (eq 403 (car res))
+                    (not-logged-page env res)
+                    res))))))))
 
 (defun secrets-from-ubiquitous ()
   (ubiquitous:restore 'openid-connect)
@@ -53,7 +68,7 @@ login manager is developed.
     (:div
      (dolist (pr (available-providers))
        (htm (:p (:a :href (make-login-url pr)
-                    (format nil "~:(~a~)" (provider-string pr)))))))))
+                    (format s "~:(~a~)" (provider-string pr)))))))))
 
 (defun login-page ()
   (with-html-output-to-string (s)
@@ -62,7 +77,20 @@ login manager is developed.
      (:body (:h1 "Choose a login provider")
             (login-links)))))
 
-;;;FIXME: Not in use. Remove.
+(defun not-logged-page (env result)
+  (setf (gethash :oid-connect-destination (getf env :lack.session))
+        (webhax:url-from-env env))
+  (list
+   (car result)
+   (second result)
+   (with-html-output-to-string (s)
+     (:html
+      (:head (:title "Please Log In"))
+      (:body (:h1 "Not logged in")
+             (:h2 "Choose a login provider")
+             (str (login-links)))))))
+
+;;;FIXME: Not in use. Remove?
 (defun logged-in-page ()
   (with-html-output-to-string (s)
     (:html
