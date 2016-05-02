@@ -8,5 +8,5 @@
    #:*callback-extension*
    #:*login-extension*
    #:available-providers
-   #:app))
+   #:component))
 

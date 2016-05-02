@@ -83,12 +83,13 @@ login manager is developed.
   (list
    (car result)
    (second result)
-   (with-html-output-to-string (s)
-     (:html
-      (:head (:title "Please Log In"))
-      (:body (:h1 "Not logged in")
-             (:h2 "Choose a login provider")
-             (str (login-links)))))))
+   (list
+    (with-html-output-to-string (s)
+      (:html
+       (:head (:title "Please Log In"))
+       (:body (:h1 "Not logged in")
+              (:h2 "Choose a login provider")
+              (str (login-links))))))))
 
 ;;;FIXME: Not in use. Remove?
 (defun logged-in-page ()
