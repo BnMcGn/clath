@@ -116,7 +116,9 @@ login manager is developed.
 (defun logged-in ()
   (let ((uinfo (gethash :oid-connect-userinfo (ningle:context :session))))
     (setf (gethash :username (ningle:context :session))
-          (aand (assoc :email uinfo) (cdr it)))
+          (format nil "~a@~a" (aand (assoc :sub uinfo) (cdr it))
+                  (string-downcase
+                   (gethash :oid-connect-provider (ningle:context :session)))))
     (setf (gethash :display-name (ningle:context :session))
           (or (aand (assoc :preferred--username uinfo) (cdr it))
               (aand (assoc :nickname uinfo) (cdr it))
