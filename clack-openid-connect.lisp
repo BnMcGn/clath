@@ -97,8 +97,10 @@ login manager is developed.
     (:html
      (:head (:title "Logged in"))
      (:body
-      (:h1 (str (format nil "~a is logged in"
-                      (gethash :username (ningle:context :session)))))))))
+      (:h1 (str
+            (format nil "~a is logged in as ~a"
+                    (gethash :username (ningle:context :session))
+                    (gethash :display-name (ningle:context :session)))))))))
 
 (defun logout-url ()
   (concatenate 'string *server-url* *openid-app-address* *logout-extension*))
