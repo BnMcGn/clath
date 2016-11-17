@@ -114,10 +114,15 @@
   (and (ningle:context :session)
        (equal (gethash 'state (ningle:context :session)) received-state)))
 
+;;;FIXME: oidc shouldn't be handling destination/redirect. It's a more general
+;;; problem. *login-destination* is a temporary hack to deal with that.
+
+(defvar *login-destination* nil)
 (defun destination-on-login ()
-  (aif (gethash :oid-connect-destination (ningle:context :session))
-       it
-       "/"))
+  (if *login-destination* *login-destination*
+      (aif (gethash :oid-connect-destination (ningle:context :session))
+           it
+           "/")))
 
 (defun callback-action (provider parameters &optional post-func)
   ;;Can we check state yet?
