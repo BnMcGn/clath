@@ -9,5 +9,7 @@
    #:*login-extension*
    #:available-providers
    #:component
-   #:*login-destination*))
+   #:*login-destination*
+   #:login-url
+   #:logout-url))
 

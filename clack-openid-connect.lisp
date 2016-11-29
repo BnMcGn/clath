@@ -105,6 +105,9 @@ login manager is developed.
 (defun logout-url ()
   (concatenate 'string *server-url* *openid-app-address* *logout-extension*))
 
+(defun login-url ()
+  (concatenate 'string *server-url* *openid-app-address* *login-extension*))
+
 (defun logout-page ()
   (logout)
   (logged-out)
@@ -122,8 +125,8 @@ login manager is developed.
     (setf (gethash :display-name (ningle:context :session))
           (or (aand (assoc :preferred--username uinfo) (cdr it))
               (aand (assoc :nickname uinfo) (cdr it))
-              (aand (assoc :given--name uinfo) (cdr it))
               (aand (assoc :name uinfo) (cdr it))
+              (aand (assoc :given--name uinfo) (cdr it))
               (aand (assoc :email uinfo) (cdr it))))))
 
 (defun logged-out ()
