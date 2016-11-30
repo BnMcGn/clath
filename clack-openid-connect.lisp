@@ -26,6 +26,9 @@ login manager is developed.
               (lambda (params)
                 (declare (ignore params))
                 (login-action pr)))
+        (setf (ningle:route app (concatenate 'string "/" *login-extension*)
+                            :method :get)
+              #'login-page)
         (setf (ningle:route
                app (concatenate 'string "/" *callback-extension* name)
                :method :get)
@@ -70,12 +73,13 @@ login manager is developed.
        (htm (:p (:a :href (make-login-url pr)
                     (format s "~:(~a~)" (provider-string pr)))))))))
 
-(defun login-page ()
+(defun login-page (param)
+  (declare (ignore param))
   (with-html-output-to-string (s)
     (:html
      (:head (:title "Login"))
      (:body (:h1 "Choose a login provider")
-            (login-links)))))
+            (str (login-links))))))
 
 (defun not-logged-page (env result)
   (setf (gethash :oid-connect-destination (getf env :lack.session))
@@ -103,10 +107,10 @@ login manager is developed.
                     (gethash :display-name (ningle:context :session)))))))))
 
 (defun logout-url ()
-  (concatenate 'string *server-url* *openid-app-address* *logout-extension*))
+  (concatenate 'string *openid-app-address* "/" *logout-extension*))
 
 (defun login-url ()
-  (concatenate 'string *server-url* *openid-app-address* *login-extension*))
+  (concatenate 'string *openid-app-address* "/" *login-extension*))
 
 (defun logout-page ()
   (logout)
