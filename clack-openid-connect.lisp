@@ -73,8 +73,9 @@ login manager is developed.
        (htm (:p (:a :href (make-login-url pr)
                     (format s "~:(~a~)" (provider-string pr)))))))))
 
-(defun login-page (param)
-  (declare (ignore param))
+(defun login-page (params)
+  (awhen (assoc "destination" params :test #'equal)
+    (setf *login-destination* (cdr it)))
   (with-html-output-to-string (s)
     (:html
      (:head (:title "Login"))
