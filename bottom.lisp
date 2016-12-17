@@ -118,7 +118,7 @@
 ;;; problem. *login-destination* is a temporary hack to deal with that.
 
 (defvar *login-destination* nil)
-(defvar *login-destination-hook* nil)
+(defparameter *login-destination-hook* nil)
 
 (defun destination-on-login ()
   (if (functionp *login-destination-hook*)

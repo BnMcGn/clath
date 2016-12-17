@@ -113,8 +113,9 @@ login manager is developed.
 (defun login-url ()
   (concatenate 'string *openid-app-address* "/" *login-extension*))
 
-(defun logout-page ()
-  (logout)
+(defun logout-page (params)
+  (declare (ignore params))
+  (logout-action)
   (logged-out)
   (with-html-output-to-string (s)
     (:html

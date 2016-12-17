@@ -11,5 +11,6 @@
    #:component
    #:*login-destination*
    #:login-url
-   #:logout-url))
+   #:logout-url
+   #:*login-destination-hook*))
 
