@@ -76,11 +76,14 @@ login manager is developed.
 (defun login-page (params)
   (awhen (assoc "destination" params :test #'equal)
     (setf *login-destination* (cdr it)))
-  (with-html-output-to-string (s)
-    (:html
-     (:head (:title "Login"))
-     (:body (:h1 "Choose a login provider")
-            (str (login-links))))))
+  (funcall
+   (webhax:quick-page
+    (webhax:add-part :@title "Login")
+    (lambda ()
+      (webhax:html-out
+        (:h1 "Choose a login provider")
+        (str (login-links)))))
+   nil))
 
 (defun not-logged-page (env result)
   (setf (gethash :oid-connect-destination (getf env :lack.session))
@@ -117,10 +120,12 @@ login manager is developed.
   (declare (ignore params))
   (logout-action)
   (logged-out)
-  (with-html-output-to-string (s)
-    (:html
-     (:head (:title "Logged out"))
-     (:body (:h1 "Logged out")))))
+  (funcall
+   (webhax:quick-page
+    (webhax:add-part :@title "Logged out")
+    (lambda ()
+      (webhax:html-out
+        (:body (:h1 "Logged out")))))))
 
 (defun logged-in ()
   (let ((uinfo (gethash :oid-connect-userinfo (ningle:context :session))))
