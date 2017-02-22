@@ -1,11 +1,20 @@
 (in-package :clack-openid-connect)
 
+(defun check-for-error (parameters)
+  (alexandria:when-let
+      ((err (assoc :error parameters))
+       (err-msg (assoc :error--description parameters)))
+    (error
+     (format nil "OpenID Server Error: ~a, ~a" (cdr err) (cdr err-msg)))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun default-token-processor (parameters)
+    (check-for-error parameters)
     (let ((access-token (cdr (assoc :access--token parameters))))
       (values access-token access-token)))
 
   (defun google-token-processor (parameters)
+    (check-for-error parameters)
     (values (cdr (assoc :access--token parameters))
             (cljwt:decode
              (cdr (assoc :id--token parameters))
