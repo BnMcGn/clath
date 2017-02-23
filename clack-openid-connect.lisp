@@ -125,7 +125,8 @@ login manager is developed.
     (webhax:add-part :@title "Logged out")
     (lambda ()
       (webhax:html-out
-        (:body (:h1 "Logged out")))))))
+        (:body (:h1 "Logged out")))))
+   nil))
 
 (defun logged-in ()
   (let ((uinfo (gethash :oid-connect-userinfo (ningle:context :session))))
