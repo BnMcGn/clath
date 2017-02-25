@@ -120,13 +120,14 @@ login manager is developed.
   (declare (ignore params))
   (logout-action)
   (logged-out)
-  (funcall
-   (webhax:quick-page
-    (webhax:add-part :@title "Logged out")
-    (lambda ()
-      (webhax:html-out
-        (:body (:h1 "Logged out")))))
-   nil))
+  (let ((webhax:*should-login-return* nil))
+    (funcall
+     (webhax:quick-page
+      (webhax:add-part :@title "Logged out")
+      (lambda ()
+        (webhax:html-out
+          (:body (:h1 "Logged out")))))
+     nil)))
 
 (defun logged-in ()
   (let ((uinfo (gethash :oid-connect-userinfo (ningle:context :session))))
