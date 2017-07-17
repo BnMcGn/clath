@@ -89,19 +89,39 @@
 (defun request-access-token (provider code redirect-uri)
   (let ((info (provider-info provider))
         (secrets (provider-secrets provider)))
-    (funcall
-     (getf info :token-processor)
-     (cl-json:decode-json-from-string
-      (drakma:http-request
-       (getf info :token-endpoint)
-       :method :post
-       :redirect nil
-       :parameters `(("code" . ,code)
-                     ("client_id" . ,(getf secrets :client-id))
-                     ("app_id" . ,(getf secrets :client-id))
-                     ("client_secret" . ,(getf secrets :secret))
-                     ("redirect_uri" . ,redirect-uri)
-                     ("grant_type" . "authorization_code")))))))
+    (multiple-value-bind (response code headers)
+        (drakma:http-request
+         (getf info :token-endpoint)
+         :method :post
+         :redirect nil
+         :parameters `(("code" . ,code)
+                       ("client_id" . ,(getf secrets :client-id))
+                       ("app_id" . ,(getf secrets :client-id))
+                       ("client_secret" . ,(getf secrets :secret))
+                       ("redirect_uri" . ,redirect-uri)
+                       ("grant_type" . "authorization_code")))
+      (declare (ignore code))
+      (let ((subtype (nth-value 1 (drakma:get-content-type headers))))
+        (check-for-error
+         (cond
+           ((equal subtype "json")
+            (cl-json:decode-json-from-string response))
+           ((equal subtype "x-www-form-urlencoded")
+            (quri:url-decode-params
+             (flexi-streams:octets-to-string response)))))))))
+
+(defun get-access-token (atdata)
+  (alexandria:if-let ((atok (assoc :access--token atdata)))
+    (cdr atok)
+    (cdr (assoc "access_token" atdata :test #'equal))))
+
+(defun get-id-token (atdata)
+  (alexandria:if-let ((itok (assoc :id--token atdata)))
+    ;;FIXME: Perhaps should be downloading key and verifying JWT
+    (let ((claims (cljwt:unpack (cdr itok))))
+      (cljwt:verify-timestamps claims)
+      claims)
+    (get-access-token atdata)))
 
 (defun request-user-info (provider access-token)
   ;;FIXME: Doesn't handle failure
@@ -133,14 +153,17 @@
   ;;Can we check state yet?
   (if (not (valid-state (assoc-cdr "state" parameters #'equal)))
       '(403 '() "Login failed. State mismatch.")
-      (multiple-value-bind (access-token id-token)
-          (request-access-token
-           provider (assoc-cdr "code" parameters #'equal) (make-callback-url provider))
-        (with-keys (:oid-connect-access-token :oid-connect-userinfo :oid-connect-id-token)
+      (let* ((at-data (request-access-token
+                       provider
+                       (assoc-cdr "code" parameters #'equal)
+                       (make-callback-url provider)))
+             (access-token (get-access-token at-data)))
+        (with-keys (:oid-connect-access-token :oid-connect-userinfo
+                                              :oid-connect-id-token)
             (ningle:context :session)
           (setf oid-connect-access-token access-token
                 oid-connect-userinfo (request-user-info provider access-token)
-                oid-connect-id-token id-token))
+                oid-connect-id-token (get-id-token at-data)))
         (when (functionp post-func) (funcall post-func))
         `(302 (:location ,(destination-on-login))))))
 

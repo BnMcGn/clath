@@ -9,6 +9,7 @@
                #:alexandria
                #:cl-hash-util
                #:drakma
+               #:flexi-streams
                #:cl-json
                #:cljwt
                #:cl-who
