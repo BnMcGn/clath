@@ -8,19 +8,6 @@
      (format nil "OpenID Server Error: ~a, ~a" (cdr err) (cdr err-msg))))
   parameters)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun default-token-processor (parameters)
-    (check-for-error parameters)
-    (let ((access-token (cdr (assoc :access--token parameters))))
-      (values access-token access-token)))
-
-  (defun google-token-processor (parameters)
-    (check-for-error parameters)
-    (values (cdr (assoc :access--token parameters))
-            (cljwt:decode
-             (cdr (assoc :id--token parameters))
-             :fail-if-unsupported nil))))
-
 (defparameter *provider-info*
   `(
     :facebook
@@ -29,14 +16,12 @@
      :token-endpoint "https://graph.facebook.com/v2.3/oauth/access_token"
      :userinfo-endpoint "https://graph.facebook.com/v2.3/me"
      :auth-scope "email"
-     :redirect-uri
-     :token-processor ,(function default-token-processor))
+     :redirect-uri)
     :google
     (:string "google"
      :endpoints-url
      "https://accounts.google.com/.well-known/openid-configuration"
-     :auth-scope "openid profile email"
-     :token-processor ,(function google-token-processor))
+     :auth-scope "openid profile email")
     :github
     (:string "github"
      :auth-endpoint "https://github.com/login/oauth/authorize"
@@ -44,8 +29,7 @@
      :userinfo-endpoint "https://api.github.com/user"
      ;;FIXME: email endpoint not implemented yet.
      :email-endpoint "https://api.github.com/user/emails"
-     :auth-scope ""
-     :token-processor ,(function default-token-processor))))
+     :auth-scope "")))
 
 (defparameter *provider-secrets* nil)
 
