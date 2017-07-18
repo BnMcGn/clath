@@ -3,6 +3,17 @@
 (defmacro assoc-cdr (key alist &optional (test '#'eql))
   `(cdr (assoc ,key ,alist :test ,test)))
 
+(defun assoc-or (keys alist)
+  "Finds the first key in keys that has a match in alist. Will use equal to match
+strings."
+  (when keys
+    (alexandria:if-let ((res (assoc (car keys) alist
+                                    :test (if (stringp (car keys))
+                                              #'equal
+                                              #'eql))))
+      res
+      (assoc-or (cdr keys) alist))))
+
 (defun mkstr (&rest args)
   (with-output-to-string (s)
     (dolist (a args) (princ a s))))
