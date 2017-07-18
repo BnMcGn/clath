@@ -126,17 +126,20 @@ login manager is developed.
          (:body (:h1 "Logged out")))))))
 
 (defun logged-in ()
-  (let ((uinfo (gethash :oid-connect-userinfo (ningle:context :session))))
+  (let* ((uinfo (gethash :oid-connect-userinfo (ningle:context :session)))
+         (uname
+          (cdr (assoc-or '(:sub :id) uinfo))))
+    (unless uname
+      (error "Couldn't find user ID in OAuth return data."))
     (setf (gethash :username (ningle:context :session))
-          (format nil "~a@~a" (aand (assoc :sub uinfo) (cdr it))
+          (format nil "~a@~a" uname
                   (string-downcase
                    (gethash :oid-connect-provider (ningle:context :session)))))
     (setf (gethash :display-name (ningle:context :session))
-          (or (aand (assoc :preferred--username uinfo) (cdr it))
-              (aand (assoc :nickname uinfo) (cdr it))
-              (aand (assoc :name uinfo) (cdr it))
-              (aand (assoc :given--name uinfo) (cdr it))
-              (aand (assoc :email uinfo) (cdr it))))))
+          (cdr (assoc-or
+                '(:preferred--username :nickname :login :name :given--name
+                  :email)
+                uinfo)))))
 
 (defun logged-out ()
   (remhash :username (ningle:context :session))
