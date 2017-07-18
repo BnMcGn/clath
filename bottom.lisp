@@ -1,4 +1,4 @@
-(in-package :clack-openid-connect)
+(in-package :clath)
 
 (defparameter *callback-extension* "callback/")
 (defparameter *login-extension* "login/")
@@ -75,7 +75,7 @@
     (setf (ningle:context :session) (make-hash-table)))
   (let ((state (gen-state 36)))
     (setf (gethash 'state (ningle:context :session)) state)
-    (setf (gethash :oid-connect-provider (ningle:context :session)) provider)
+    (setf (gethash :clath-provider (ningle:context :session)) provider)
     (multiple-value-bind (content resp-code headers uri)
         (apply #'request-user-auth-destination :state state
                :redirect-uri (make-callback-url provider)
@@ -134,7 +134,7 @@
   (and (ningle:context :session)
        (equal (gethash 'state (ningle:context :session)) received-state)))
 
-;;;FIXME: oidc shouldn't be handling destination/redirect. It's a more general
+;;;FIXME: clath shouldn't be handling destination/redirect. It's a more general
 ;;; problem. *login-destination* is a temporary hack to deal with that.
 
 (defvar *login-destination* nil)
@@ -145,7 +145,7 @@
       (funcall *login-destination-hook*
                :username (gethash :username (ningle:context :session)))
       (if *login-destination* *login-destination*
-          (aif (gethash :oid-connect-destination (ningle:context :session))
+          (aif (gethash :clath-destination (ningle:context :session))
                it
                "/"))))
 
@@ -158,21 +158,21 @@
                        (assoc-cdr "code" parameters #'equal)
                        (make-callback-url provider)))
              (access-token (get-access-token at-data)))
-        (with-keys (:oid-connect-access-token :oid-connect-userinfo
-                                              :oid-connect-id-token)
+        (with-keys (:clath-access-token :clath-userinfo
+                                              :clath-id-token)
             (ningle:context :session)
-          (setf oid-connect-access-token access-token
-                oid-connect-userinfo (request-user-info provider access-token)
-                oid-connect-id-token (get-id-token at-data)))
+          (setf clath-access-token access-token
+                clath-userinfo (request-user-info provider access-token)
+                clath-id-token (get-id-token at-data)))
         (when (functionp post-func) (funcall post-func))
         `(302 (:location ,(destination-on-login))))))
 
 (defun logout-action ()
   (remhash 'state (ningle:context :session))
-  (remhash :oid-connect-provider (ningle:context :session))
-  (remhash :oid-connect-access-token (ningle:context :session))
-  (remhash :oid-connect-userinfo (ningle:context :session))
-  (remhash :oid-connect-connect-id-token (ningle:context :session)))
+  (remhash :clath-provider (ningle:context :session))
+  (remhash :clath-access-token (ningle:context :session))
+  (remhash :clath-userinfo (ningle:context :session))
+  (remhash :clath-id-token (ningle:context :session)))
 
 
 

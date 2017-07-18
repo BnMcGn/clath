@@ -1,4 +1,4 @@
-(in-package :clack-openid-connect)
+(in-package :clath)
 
 (defun check-for-error (parameters)
   (alexandria:when-let

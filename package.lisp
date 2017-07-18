@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage #:clack-openid-connect
+(defpackage #:clath
   (:use #:cl #:cl-who #:anaphora)
   (:import-from #:cl-hash-util
                 #:with-keys)

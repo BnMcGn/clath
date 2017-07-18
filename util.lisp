@@ -1,4 +1,4 @@
-(in-package :clack-openid-connect)
+(in-package :clath)
 
 (defmacro assoc-cdr (key alist &optional (test '#'eql))
   `(cdr (assoc ,key ,alist :test ,test)))

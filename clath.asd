@@ -1,7 +1,7 @@
-;;;; clack-openid-connect.asd
+;;;; clath.asd
 
-(asdf:defsystem #:clack-openid-connect
-  :description "Describe clack-openid-connect here"
+(asdf:defsystem #:clath
+  :description "Describe clath here"
   :author "Your Name <your.name@example.com>"
   :license "Specify license here"
   :depends-on (#:ningle
@@ -21,5 +21,5 @@
                (:file "util")
                (:file "providers")
                (:file "bottom")
-               (:file "clack-openid-connect")))
+               (:file "clath")))
 

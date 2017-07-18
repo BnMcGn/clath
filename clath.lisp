@@ -1,4 +1,4 @@
-(in-package :clack-openid-connect)
+(in-package :clath)
 
 #|
 
@@ -7,7 +7,7 @@ login manager is developed.
 
 |#
 
-(defparameter *openid-app-address* "/oid_connect")
+(defparameter *openid-app-address* "/clath")
 (defparameter *logout-extension* "logout/")
 
 ;;;FIXME: *server-url* can't be dynamically set with let, because functions are not
@@ -54,7 +54,7 @@ login manager is developed.
                     res))))))))
 
 (defun secrets-from-ubiquitous ()
-  (ubiquitous:restore 'openid-connect)
+  (ubiquitous:restore 'clath)
   (let ((providers (loop for (k . v) on *provider-info* by #'cddr collect k)))
     (mapcan (lambda (pr)
               (when (ubiquitous:value pr)
@@ -84,7 +84,7 @@ login manager is developed.
        (str (login-links))))))
 
 (defun not-logged-page (env result)
-  (setf (gethash :oid-connect-destination (getf env :lack.session))
+  (setf (gethash :clath-destination (getf env :lack.session))
         (webhax:url-from-env env))
   (list
    (car result)
@@ -126,7 +126,7 @@ login manager is developed.
          (:body (:h1 "Logged out")))))))
 
 (defun logged-in ()
-  (let* ((uinfo (gethash :oid-connect-userinfo (ningle:context :session)))
+  (let* ((uinfo (gethash :clath-userinfo (ningle:context :session)))
          (uname
           (cdr (assoc-or '(:sub :id) uinfo))))
     (unless uname
@@ -134,7 +134,7 @@ login manager is developed.
     (setf (gethash :username (ningle:context :session))
           (format nil "~a@~a" uname
                   (string-downcase
-                   (gethash :oid-connect-provider (ningle:context :session)))))
+                   (gethash :clath-provider (ningle:context :session)))))
     (setf (gethash :display-name (ningle:context :session))
           (cdr (assoc-or
                 '(:preferred--username :nickname :login :name :given--name
