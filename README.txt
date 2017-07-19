@@ -18,3 +18,20 @@ Github:
 http://yoursite.somewhere/clath/callback/github
 
 is your callback url.
+
+Google:
+
+-Main Google documentation is here:
+https://developers.google.com/identity/protocols/OpenIDConnect
+-Actual setup happens here:
+https://console.developers.google.com/apis/credentials
+
+-Callback url:
+
+-http://yoursite.somewhere/clath/callback/google
+
+Reddit:
+
+-Log in to your account
+-Preferences -> Apps -> are you a developer? create an app...
+

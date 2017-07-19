@@ -29,7 +29,13 @@
      :userinfo-endpoint "https://api.github.com/user"
      ;;FIXME: email endpoint not implemented yet.
      :email-endpoint "https://api.github.com/user/emails"
-     :auth-scope "")))
+     :auth-scope "")
+    :reddit
+    (:string "reddit"
+     :auth-endpoint "https://www.reddit.com/api/v1/authorize"
+     :token-endpoint "https://www.reddit.com/api/v1/access_token"
+     :userinfo-endpoint "https://www.reddit.com/api/v1/me"
+     :auth-scope "identity")))
 
 (defparameter *provider-secrets* nil)
 
