@@ -34,7 +34,7 @@
     (:string "reddit"
      :auth-endpoint "https://www.reddit.com/api/v1/authorize"
      :token-endpoint "https://www.reddit.com/api/v1/access_token"
-     :userinfo-endpoint "https://www.reddit.com/api/v1/me"
+     :userinfo-endpoint "https://oauth.reddit.com/api/v1/me"
      :auth-scope "identity")))
 
 (defparameter *provider-secrets* nil)

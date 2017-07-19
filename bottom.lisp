@@ -4,6 +4,13 @@
 (defparameter *login-extension* "login/")
 (defvar *server-url*)
 
+(defparameter *clath-version* "0.1")
+
+(defun user-agent (provider)
+  "Some providers, such as Reddit, want a fairly unique user-agent."
+  (declare (ignore provider)) ;For now
+  (format nil "Clath/~a by BnMcGn" *clath-version*))
+
 (setf drakma:*text-content-types*
       (cons '("application" . "json") drakma:*text-content-types*))
 
@@ -39,6 +46,10 @@
   (aif (getf (getf *provider-info* provider) :string)
        it
        (string-downcase (string provider))))
+
+(defun basic-authorization (provider)
+  (let ((secrets (provider-secrets provider)))
+    (list (getf secrets :client-id) (getf secrets :secret))))
 
 (defun make-login-url (provider)
   (concatenate 'string *server-url* *login-extension* (provider-string provider)))
@@ -94,6 +105,8 @@
          (getf info :token-endpoint)
          :method :post
          :redirect nil
+         :user-agent (user-agent provider)
+         :basic-authorization (basic-authorization provider)
          :parameters `(("code" . ,code)
                        ("client_id" . ,(getf secrets :client-id))
                        ("app_id" . ,(getf secrets :client-id))
@@ -108,7 +121,9 @@
             (cl-json:decode-json-from-string response))
            ((equal subtype "x-www-form-urlencoded")
             (quri:url-decode-params
-             (flexi-streams:octets-to-string response)))))))))
+             (flexi-streams:octets-to-string response)))
+           (t (error
+               "Couldn't find parseable access token"))))))))
 
 (defun get-access-token (atdata)
   (alexandria:if-let ((atok (assoc :access--token atdata)))
@@ -123,12 +138,27 @@
       claims)
     (get-access-token atdata)))
 
-(defun request-user-info (provider access-token)
+(defgeneric request-user-info (provider access-token))
+
+(defmethod request-user-info ((provider t) access-token)
   ;;FIXME: Doesn't handle failure
   (cl-json:decode-json-from-string
    (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
-                        :parameters `(("alt" . "json") ;Facebook might not like alt param?
-                                      ("access_token" . ,access-token)))))
+                        ;;Facebook might not like alt param?
+                        :parameters `(("alt" . "json")
+                                      ("access_token" . ,access-token))
+                        :basic-authorization (basic-authorization provider)
+                        :user-agent (user-agent provider))))
+
+(defmethod request-user-info ((provider (eql :reddit)) access-token)
+  (cl-json:decode-json-from-string
+   (drakma:http-request (print (getf (provider-info provider) :userinfo-endpoint))
+                        :parameters `(("access_token" . ,access-token))
+                        :method :get
+                        :additional-headers
+                        `(("Authorization"
+                           . ,(format nil "bearer ~a" access-token)))
+                        :user-agent (user-agent provider))))
 
 (defun valid-state (received-state)
   (and (ningle:context :session)
