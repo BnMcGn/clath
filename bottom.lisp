@@ -150,22 +150,27 @@
                "/"))))
 
 (defun callback-action (provider parameters &optional post-func)
-  ;;Can we check state yet?
-  (if (not (valid-state (assoc-cdr "state" parameters #'equal)))
-      '(403 '() "Login failed. State mismatch.")
-      (let* ((at-data (request-access-token
-                       provider
-                       (assoc-cdr "code" parameters #'equal)
-                       (make-callback-url provider)))
-             (access-token (get-access-token at-data)))
-        (with-keys (:clath-access-token :clath-userinfo
-                                              :clath-id-token)
-            (ningle:context :session)
-          (setf clath-access-token access-token
-                clath-userinfo (request-user-info provider access-token)
-                clath-id-token (get-id-token at-data)))
-        (when (functionp post-func) (funcall post-func))
-        `(302 (:location ,(destination-on-login))))))
+  (cond ((not (valid-state (assoc-cdr "state" parameters #'equal)))
+         '(403 '() "Login failed. State mismatch."))
+        ((not (assoc-cdr "code" parameters #'equal))
+         '(403 '() "Login failed. Didn't receive code parameter from OAuth Server."))
+        (t
+         (let* ((at-data (request-access-token
+                          provider
+                          (assoc-cdr "code" parameters #'equal)
+                          (make-callback-url provider)))
+                (access-token (get-access-token at-data)))
+           (when (assoc :error at-data)
+             (error (format nil "Error message from OAuth server: ~a"
+                            (assoc-cdr :message at-data))))
+           (with-keys (:clath-access-token :clath-userinfo
+                                           :clath-id-token)
+               (ningle:context :session)
+             (setf clath-access-token access-token
+                   clath-userinfo (request-user-info provider access-token)
+                   clath-id-token (get-id-token at-data)))
+           (when (functionp post-func) (funcall post-func))
+           `(302 (:location ,(destination-on-login)))))))
 
 (defun logout-action ()
   (remhash 'state (ningle:context :session))
