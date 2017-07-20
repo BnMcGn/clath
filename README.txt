@@ -35,3 +35,15 @@ Reddit:
 -Log in to your account
 -Preferences -> Apps -> are you a developer? create an app...
 
+Yahoo:
+
+-https://developer.yahoo.com/oauth/
+-My Apps -> YDN apps -> Create a new app
+-Note: callback URL can't have string "yahoo" in it.
+-Note: callback URL must exist on public internet, so no local testing.
+-NOT IMPLEMENTED YET
+
+Stackexchange:
+
+https://api.stackexchange.com/
+-Register For An App Key

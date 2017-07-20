@@ -35,11 +35,15 @@
      :auth-endpoint "https://www.reddit.com/api/v1/authorize"
      :token-endpoint "https://www.reddit.com/api/v1/access_token"
      :userinfo-endpoint "https://oauth.reddit.com/api/v1/me"
-     :auth-scope "identity")))
+     :auth-scope "identity")
+    :stackexchange
+    (:string "stackexchange"
+     :auth-endpoint "https://stackexchange.com/oauth"
+     :token-endpoint "https://stackexchange.com/oauth/access_token"
+     :userinfo-endpoint "https://api.stackexchange.com/2.1/me"
+     ;:userinfo-endpoint "https://api.stackexchange.com/2.1/me?site=stackoverflow"
+     :auth-scope "")))
 
 (defparameter *provider-secrets* nil)
 
-;;;Token processors, given the callback parameters as an alist, should return, as values,
-;;; the access token, and the id token. Providers vary about what this means. Facebook,
-;;; for example, uses the access-token as the id-token, whereas Google does something else.
 
