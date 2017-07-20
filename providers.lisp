@@ -40,8 +40,8 @@
     (:string "stackexchange"
      :auth-endpoint "https://stackexchange.com/oauth"
      :token-endpoint "https://stackexchange.com/oauth/access_token"
-     :userinfo-endpoint "https://api.stackexchange.com/2.1/me"
-     ;:userinfo-endpoint "https://api.stackexchange.com/2.1/me?site=stackoverflow"
+     ;:userinfo-endpoint "https://api.stackexchange.com/2.1/me"
+     :userinfo-endpoint "https://api.stackexchange.com/2.1/me?site=stackoverflow"
      :auth-scope "")))
 
 (defparameter *provider-secrets* nil)

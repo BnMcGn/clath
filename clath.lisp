@@ -59,8 +59,10 @@ login manager is developed.
     (mapcan (lambda (pr)
               (when (ubiquitous:value pr)
                 (list pr
-                      (list :client-id (ubiquitous:value pr :client-id)
-                            :secret (ubiquitous:value pr :secret)))))
+                      (list* :client-id (ubiquitous:value pr :client-id)
+                             :secret (ubiquitous:value pr :secret)
+                             (when (ubiquitous:value pr :key)
+                               (list :key (ubiquitous:value pr :key)))))))
             providers)))
 
 (defun initialize-secrets ()
@@ -128,7 +130,7 @@ login manager is developed.
 (defun logged-in ()
   (let* ((uinfo (gethash :clath-userinfo (ningle:context :session)))
          (uname
-          (cdr (assoc-or '(:sub :id) uinfo))))
+          (cdr (assoc-or '(:sub :id :user--id) uinfo))))
     (unless uname
       (error "Couldn't find user ID in OAuth return data."))
     (setf (gethash :username (ningle:context :session))
@@ -137,8 +139,8 @@ login manager is developed.
                    (gethash :clath-provider (ningle:context :session)))))
     (setf (gethash :display-name (ningle:context :session))
           (cdr (assoc-or
-                '(:preferred--username :nickname :login :name :given--name
-                  :email)
+                '(:preferred--username :nickname :login :name :display--name
+                  :given--name :email)
                 uinfo)))))
 
 (defun logged-out ()

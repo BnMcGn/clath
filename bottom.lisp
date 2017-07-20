@@ -122,6 +122,8 @@
            ((equal subtype "x-www-form-urlencoded")
             (quri:url-decode-params
              (flexi-streams:octets-to-string response)))
+           ((equal subtype "plain")
+            (quri:url-decode-params response))
            (t (error
                "Couldn't find parseable access token"))))))))
 
@@ -152,13 +154,26 @@
 
 (defmethod request-user-info ((provider (eql :reddit)) access-token)
   (cl-json:decode-json-from-string
-   (drakma:http-request (print (getf (provider-info provider) :userinfo-endpoint))
+   (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
                         :parameters `(("access_token" . ,access-token))
                         :method :get
                         :additional-headers
                         `(("Authorization"
                            . ,(format nil "bearer ~a" access-token)))
                         :user-agent (user-agent provider))))
+
+(defmethod request-user-info ((provider (eql :stackexchange)) access-token)
+  (cadr
+   (assoc
+    :items
+    (cl-json:decode-json-from-string
+     (drakma:http-request  (getf (provider-info provider) :userinfo-endpoint)
+                           :parameters `(("key" . ,(getf (provider-secrets provider)
+                                                         :key))
+                                         ("access_token" . ,access-token))
+                           :basic-authorization (basic-authorization provider)
+                           :decode-content t
+                           :user-agent (user-agent provider))))))
 
 (defun valid-state (received-state)
   (and (ningle:context :session)
