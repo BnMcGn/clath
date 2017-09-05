@@ -12,6 +12,10 @@
   `(
     :facebook
     (:string "facebook"
+             :auth-endpoint ""
+             :token-endpoint "https://graph.facebook.com/v2.10/oauth/access_token")
+    :facebook
+    (:string "facebook"
      :auth-endpoint "https://www.facebook.com/dialog/oauth"
      :token-endpoint "https://graph.facebook.com/v2.3/oauth/access_token"
      :userinfo-endpoint "https://graph.facebook.com/v2.3/me"
@@ -42,6 +46,13 @@
      :token-endpoint "https://stackexchange.com/oauth/access_token"
      ;:userinfo-endpoint "https://api.stackexchange.com/2.1/me"
      :userinfo-endpoint "https://api.stackexchange.com/2.1/me?site=stackoverflow"
+     :auth-scope "")
+    :twitter
+    (:string "twitter"
+     :auth-endpoint "https://api.twitter.com/oauth/authorize"
+     :token-endpoint "https://api.twitter.com/oauth/access_token"
+     :userinfo-endpoint
+     "https://api.twitter.com/1.1/account/verify_credentials.json"
      :auth-scope "")))
 
 (defparameter *provider-secrets* nil)

@@ -9,6 +9,10 @@ that provider.
 
 Hints:
 
+Facebook:
+
+https://developers.facebook.com/apps/
+
 Github:
 -Log in to your account
 -Settings -> OAuth applications (look under Developer settings) ->
@@ -47,3 +51,9 @@ Stackexchange:
 
 https://api.stackexchange.com/
 -Register For An App Key
+
+Twitter:
+
+https://apps.twitter.com/
+- Create New App
+

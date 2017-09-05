@@ -17,6 +17,7 @@ login manager is developed.
 
 (defun login-app (base-url)
   (setf *server-url* base-url)
+  ;;FIXME: Doesn't work first time this is called.
   (initialize-secrets)
   (let ((app (make-instance 'ningle:<app>)))
     (dolist (pr (available-providers))
