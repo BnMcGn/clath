@@ -22,16 +22,32 @@ login manager is developed.
   (let ((app (make-instance 'ningle:<app>)))
     (dolist (pr (available-providers))
       (let ((name (provider-string pr)))
-        (setf (ningle:route app (concatenate 'string "/" *login-extension* name)
-                            :method :get)
-              (lambda (params)
-                (declare (ignore params))
-                (login-action pr)))
-        (setf (ningle:route
-               app (concatenate 'string "/" *callback-extension* name)
-               :method :get)
-              (lambda (params)
-                (callback-action pr params #'logged-in)))))
+        (if (uses-north-p pr)
+            (progn
+              (setf (ningle:route
+                     app (concatenate 'string "/" *login-extension-north* name)
+                     :method :get)
+                    (lambda (params)
+                      (declare (ignore params))
+                      (login-action-north pr)))
+              (setf (ningle:route
+                     app
+                     (concatenate 'string "/" *callback-extension-north* name)
+                     :method :get)
+                    (lambda (params)
+                      (callback-action-north pr params #'logged-in))))
+            (progn
+              (setf (ningle:route
+                     app (concatenate 'string "/" *login-extension* name)
+                     :method :get)
+                    (lambda (params)
+                      (declare (ignore params))
+                      (login-action pr)))
+              (setf (ningle:route
+                     app (concatenate 'string "/" *callback-extension* name)
+                    :method :get)
+                    (lambda (params)
+                      (callback-action pr params #'logged-in)))))))
     (setf (ningle:route app (concatenate 'string "/" *login-extension*)
                         :method :get)
           #'login-page)

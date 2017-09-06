@@ -2,6 +2,9 @@
 
 (defparameter *callback-extension* "callback/")
 (defparameter *login-extension* "login/")
+;;Because north supports oauth 1.0a
+(defparameter *callback-extention-north* "callback1a/")
+(defparameter *login-extension-north* "login1a/")
 (defvar *server-url*)
 
 (defparameter *clath-version* "0.1")
@@ -47,12 +50,18 @@
        it
        (string-downcase (string provider))))
 
+(defun uses-north-p (provider)
+  (getf (getf *provider-info* provider) :use-north))
+
 (defun basic-authorization (provider)
   (let ((secrets (provider-secrets provider)))
     (list (getf secrets :client-id) (getf secrets :secret))))
 
 (defun make-login-url (provider)
-  (concatenate 'string *server-url* *login-extension* (provider-string provider)))
+  (concatenate
+   'string *server-url*
+   (if (uses-north-p provider) *login-extension-north* *login-extension*)
+   (provider-string provider)))
 
 (defun make-callback-url (provider)
   (concatenate 'string *server-url* *callback-extension* (provider-string provider)))
@@ -190,7 +199,43 @@
   (remhash :clath-userinfo (ningle:context :session))
   (remhash :clath-id-token (ningle:context :session)))
 
+;;;WARNING: Function saves state to session!
+(defun login-action-north (provider)
+  (unless (ningle:context :session)
+    (setf (ningle:context :session) (make-hash-table)))
+  (let ((state (gen-state 36)))
+    (setf (gethash 'state (ningle:context :session)) state)
+    (setf (gethash :clath-provider (ningle:context :session)) provider)
+    (multiple-value-bind (content resp-code headers uri)
+        (apply #'request-user-auth-destination :state state
+               :redirect-uri (make-callback-url provider)
+               :client-id (getf (provider-secrets provider) :client-id)
+               (provider-info provider))
+      (declare (ignore headers))
+      (if (< resp-code 400) `(302 (:location ,(format nil "~a" uri)))
+          content))))
 
-
+(defun callback-action-north (provider parameters &optional post-func)
+  (cond ((not (valid-state (assoc-cdr "state" parameters #'equal)))
+         '(403 '() "Login failed. State mismatch."))
+        ((not (assoc-cdr "code" parameters #'equal))
+         '(403 '() "Login failed. Didn't receive code parameter from OAuth Server."))
+        (t
+         (let* ((at-data (request-access-token
+                          provider
+                          (assoc-cdr "code" parameters #'equal)
+                          (make-callback-url provider)))
+                (access-token (get-access-token at-data)))
+           (when (assoc :error at-data)
+             (error (format nil "Error message from OAuth server: ~a"
+                            (assoc-cdr :message at-data))))
+           (with-keys (:clath-access-token :clath-userinfo
+                                           :clath-id-token)
+               (ningle:context :session)
+             (setf clath-access-token access-token
+                   clath-userinfo (request-user-info provider access-token)
+                   clath-id-token (get-id-token at-data)))
+           (when (functionp post-func) (funcall post-func))
+           `(302 (:location ,(destination-on-login)))))))
 
 
