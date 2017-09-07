@@ -15,7 +15,8 @@
                #:cl-who
                #:ubiquitous
                #:anaphora
-               #:webhax)
+               #:webhax
+               #:north)
   :serial t
   :components ((:file "package")
                (:file "util")

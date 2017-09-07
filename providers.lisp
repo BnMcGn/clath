@@ -49,8 +49,10 @@
      :auth-scope "")
     :twitter
     (:string "twitter"
+     :use-north t
      :auth-endpoint "https://api.twitter.com/oauth/authorize"
-     :token-endpoint "https://api.twitter.com/oauth/access_token"
+     :access-endpoint "https://api.twitter.com/oauth/access_token"
+     :request-endpoint "https://api.twitter.com/oauth/request_token"
      :userinfo-endpoint
      "https://api.twitter.com/1.1/account/verify_credentials.json"
      :auth-scope "")))
@@ -92,4 +94,10 @@
                            :decode-content t
                            :user-agent (user-agent provider))))))
 
-
+;;For now we will hope that all OAuth1.0a providers will behave the same.
+;;If not, this can be turned into generic-and-methods.
+(defun request-user-info-north (provider north-client)
+  (cl-json:decode-json-from-string
+   (north:make-signed-request
+    north-client
+    (getf (provider-info provider) :userinfo-endpoint) :get)))

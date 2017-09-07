@@ -3,7 +3,7 @@
 (defparameter *callback-extension* "callback/")
 (defparameter *login-extension* "login/")
 ;;Because north supports oauth 1.0a
-(defparameter *callback-extention-north* "callback1a/")
+(defparameter *callback-extension-north* "callback1a/")
 (defparameter *login-extension-north* "login1a/")
 (defvar *server-url*)
 
@@ -64,7 +64,10 @@
    (provider-string provider)))
 
 (defun make-callback-url (provider)
-  (concatenate 'string *server-url* *callback-extension* (provider-string provider)))
+  (concatenate
+   'string *server-url*
+   (if (uses-north-p provider) *callback-extention-north* *callback-extension*)
+   (provider-string provider)))
 
 (defun available-providers ()
   (remove-if-not #'keywordp *provider-secrets*))
@@ -203,39 +206,32 @@
 (defun login-action-north (provider)
   (unless (ningle:context :session)
     (setf (ningle:context :session) (make-hash-table)))
-  (let ((state (gen-state 36)))
-    (setf (gethash 'state (ningle:context :session)) state)
-    (setf (gethash :clath-provider (ningle:context :session)) provider)
-    (multiple-value-bind (content resp-code headers uri)
-        (apply #'request-user-auth-destination :state state
-               :redirect-uri (make-callback-url provider)
-               :client-id (getf (provider-secrets provider) :client-id)
-               (provider-info provider))
-      (declare (ignore headers))
-      (if (< resp-code 400) `(302 (:location ,(format nil "~a" uri)))
-          content))))
+  (let* ((provinfo (provider-info provider))
+         (nclient
+          (make-instance
+           'north:client
+           :key (getf (provider-secrets provider) :client-id)
+           :secret (getf (provider-secrets provider) :secret)
+           :authorize-uri (getf provinfo :auth-endpoint)
+           :access-token-uri (getf provinfo :access-endpoint)
+           :request-token-uri (getf provinfo :request-endpoint)
+           :callback (make-callback-url provider))))
+    (setf (gethash 'north-client (ningle:context :session)) nclient)
+    `(302 (:location (north:initiate-authentication nclient)))))
 
 (defun callback-action-north (provider parameters &optional post-func)
-  (cond ((not (valid-state (assoc-cdr "state" parameters #'equal)))
-         '(403 '() "Login failed. State mismatch."))
-        ((not (assoc-cdr "code" parameters #'equal))
-         '(403 '() "Login failed. Didn't receive code parameter from OAuth Server."))
-        (t
-         (let* ((at-data (request-access-token
-                          provider
-                          (assoc-cdr "code" parameters #'equal)
-                          (make-callback-url provider)))
-                (access-token (get-access-token at-data)))
-           (when (assoc :error at-data)
-             (error (format nil "Error message from OAuth server: ~a"
-                            (assoc-cdr :message at-data))))
-           (with-keys (:clath-access-token :clath-userinfo
-                                           :clath-id-token)
-               (ningle:context :session)
-             (setf clath-access-token access-token
-                   clath-userinfo (request-user-info provider access-token)
-                   clath-id-token (get-id-token at-data)))
+  (let* ((nclient (gethash 'north-client (ningle:context :session)))
+         (token (north:token nclient)))
+    (cond ((not (equal token (assoc-cdr "oauth_token" parameters #'equal)))
+           '(403 '() "Login failed. State mismatch."))
+          ((not (assoc-cdr "oauth_verifier" parameters #'equal))
+           '(403 '()
+             "Login failed. Didn't receive code parameter from OAuth Server."))
+          (t
+           (north:complete-authentication
+            nclient
+            (assoc-cdr "oauth_verifier" parameters #'equal))
+           (setf (gethash :clath-userinfo (ningle:context :session))
+                 (request-user-info-north provider nclient))
            (when (functionp post-func) (funcall post-func))
            `(302 (:location ,(destination-on-login)))))))
-
-
