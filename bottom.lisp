@@ -33,7 +33,7 @@
         (alexandria:alist-plist
          (extract-keywords
           '(:auth-endpoint :token-endpoint :userinfo-endpoint :auth-scope
-            :token-processor)
+            :token-processor :access-endpoint :request-endpoint)
           prov))
         (progn
           (unless (getf prov :endpoints-url)
@@ -217,7 +217,8 @@
            :request-token-uri (getf provinfo :request-endpoint)
            :callback (make-callback-url provider))))
     (setf (gethash 'north-client (ningle:context :session)) nclient)
-    `(302 (:location (north:initiate-authentication nclient)))))
+    (setf (gethash :clath-provider (ningle:context :session)) provider)
+    `(302 (:location ,(north:initiate-authentication nclient)))))
 
 (defun callback-action-north (provider parameters &optional post-func)
   (let* ((nclient (gethash 'north-client (ningle:context :session)))
