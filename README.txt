@@ -7,6 +7,12 @@ will be given an ID and SECRET by the login provider. When these are installed
 in the correct place in ubiquitous, authentication will become available from
 that provider.
 
+# Saving your ClientID and Secret:
+
+    > (ubiquitous:restore 'clath::clath)
+    > (setf (ubiquitous:value :google :client-id) "[your client id]")
+    > (setf (ubiquitous:value :google :secret) "[your secret]")
+
 Hints:
 
 Facebook:
@@ -56,4 +62,7 @@ Twitter:
 
 https://apps.twitter.com/
 - Create New App
+
+LinkedIn:
+https://www.linkedin.com/secure/developer?newapp=
 

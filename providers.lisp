@@ -55,6 +55,13 @@
      :request-endpoint "https://api.twitter.com/oauth/request_token"
      :userinfo-endpoint
      "https://api.twitter.com/1.1/account/verify_credentials.json"
+     :auth-scope "")
+    :linkedin
+    (:string
+     "linkedin"
+     :auth-endpoint "https://www.linkedin.com/uas/oauth2/authorization"
+     :token-endpoint "https://www.linkedin.com/uas/oauth2/accessToken"
+     :userinfo-endpoint "https://api.linkedin.com/v1/people/~"
      :auth-scope "")))
 
 (defparameter *provider-secrets* nil)
@@ -79,6 +86,14 @@
                         :additional-headers
                         `(("Authorization"
                            . ,(format nil "bearer ~a" access-token)))
+                        :user-agent (user-agent provider))))
+
+(defmethod request-user-info ((provider (eql :linkedin)) access-token)
+  (cl-json:decode-json-from-string
+   (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
+                        :parameters `(("oauth2_access_token" . ,access-token)
+                                      ("format" . "json"))
+                        :method :get
                         :user-agent (user-agent provider))))
 
 (defmethod request-user-info ((provider (eql :stackexchange)) access-token)

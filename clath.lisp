@@ -149,16 +149,21 @@ login manager is developed.
          (uname
           (cdr (assoc-or '(:sub :id :user--id) uinfo))))
     (unless uname
-      (error "Couldn't find user ID in OAuth return data."))
+      (alexandria:if-let ((msg (assoc-cdr :message uinfo)))
+          (error (format nil "Message from OAuth server: ~a" msg))
+          (error "Couldn't find user ID in OAuth return data.")))
     (setf (gethash :username (ningle:context :session))
           (format nil "~a@~a" uname
                   (string-downcase
                    (gethash :clath-provider (ningle:context :session)))))
     (setf (gethash :display-name (ningle:context :session))
-          (cdr (assoc-or
-                '(:preferred--username :nickname :login :name :display--name
-                  :given--name :email)
-                uinfo)))))
+          (or (cdr (assoc-or
+                 '(:preferred--username :nickname :login :name :display--name
+                   :given--name :email)
+                 uinfo))
+              (format nil "~a ~a"
+                      (assoc-cdr :first-name uinfo)
+                      (assoc-cdr :last-name uinfo))))))
 
 (defun logged-out ()
   (remhash :username (ningle:context :session))
