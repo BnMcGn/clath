@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:clath
-  (:use #:cl #:cl-who #:anaphora)
+  (:use #:cl #:cl-who #:alexandria)
   (:import-from #:cl-hash-util
                 #:with-keys)
   (:export

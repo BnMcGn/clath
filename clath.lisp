@@ -93,8 +93,8 @@ login manager is developed.
                     (format s "~:(~a~)" (provider-string pr)))))))))
 
 (defun login-page (params)
-  (awhen (assoc "destination" params :test #'equal)
-    (setf *login-destination* (cdr it)))
+  (when-let ((dest (assoc "destination" params :test #'equal)))
+    (setf *login-destination* (cdr dest)))
   (funcall
    (webhax-route:quick-page
        (:@title "Login")
@@ -144,12 +144,14 @@ login manager is developed.
        (webhax:html-out
          (:body (:h1 "Logged out")))))))
 
+;;FIXME: :username and :display-name extraction are getting really messy.
+;; Should split out into different methods for providers.
 (defun logged-in ()
   (let* ((uinfo (gethash :clath-userinfo (ningle:context :session)))
          (uname
           (cdr (assoc-or '(:sub :id :user--id) uinfo))))
     (unless uname
-      (alexandria:if-let ((msg (assoc-cdr :message uinfo)))
+      (if-let ((msg (assoc-cdr :message uinfo)))
           (error (format nil "Message from OAuth server: ~a" msg))
           (error "Couldn't find user ID in OAuth return data.")))
     (setf (gethash :username (ningle:context :session))

@@ -7,7 +7,7 @@
   "Finds the first key in keys that has a match in alist. Will use equal to match
 strings."
   (when keys
-    (alexandria:if-let ((res (assoc (car keys) alist
+    (if-let ((res (assoc (car keys) alist
                                     :test (if (stringp (car keys))
                                               #'equal
                                               #'eql))))
@@ -30,12 +30,13 @@ strings."
         (rest nil)
         (currkey nil))
     (dolist (itm alist)
-      (anaphora:acond
+      (cond
         (currkey
          (push (cons currkey itm) keypairs)
          (setf currkey nil))
-        ((find itm keywords :test #'eq-symb)
-         (setf currkey it))
+        ((when-let ((val (find itm keywords :test #'eq-symb)))
+           (setf currkey val))
+         t)
         ((and in-list (consp itm) (find (car itm) keywords :test #'eq-symb))
          (push itm keypairs))
         (t (push itm rest))))

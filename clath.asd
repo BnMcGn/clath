@@ -14,7 +14,6 @@
                #:cljwt
                #:cl-who
                #:ubiquitous
-               #:anaphora
                #:webhax
                #:north)
   :serial t

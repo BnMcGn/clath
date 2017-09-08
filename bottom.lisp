@@ -30,7 +30,7 @@
   (let ((prov (getf *provider-info* provider)))
     (unless prov (error "Not a recognized provider"))
     (if (getf prov :auth-endpoint)
-        (alexandria:alist-plist
+        (alist-plist
          (extract-keywords
           '(:auth-endpoint :token-endpoint :userinfo-endpoint :auth-scope
             :token-processor :access-endpoint :request-endpoint)
@@ -46,8 +46,8 @@
   (getf *provider-secrets* provider))
 
 (defun provider-string (provider)
-  (aif (getf (getf *provider-info* provider) :string)
-       it
+  (if-let ((string (getf (getf *provider-info* provider) :string)))
+       string
        (string-downcase (string provider))))
 
 (defun uses-north-p (provider)
@@ -140,12 +140,12 @@
                "Couldn't find parseable access token"))))))))
 
 (defun get-access-token (atdata)
-  (alexandria:if-let ((atok (assoc :access--token atdata)))
+  (if-let ((atok (assoc :access--token atdata)))
     (cdr atok)
     (cdr (assoc "access_token" atdata :test #'equal))))
 
 (defun get-id-token (atdata)
-  (alexandria:if-let ((itok (assoc :id--token atdata)))
+  (if-let ((itok (assoc :id--token atdata)))
     ;;FIXME: Perhaps should be downloading key and verifying JWT
     (let ((claims (cljwt:unpack (cdr itok))))
       (cljwt:verify-timestamps claims)
@@ -168,8 +168,9 @@
       (funcall *login-destination-hook*
                :username (gethash :username (ningle:context :session)))
       (if *login-destination* *login-destination*
-          (aif (gethash :clath-destination (ningle:context :session))
-               it
+          (if-let ((dest (gethash :clath-destination
+                              (ningle:context :session))))
+               dest
                "/"))))
 
 (defun callback-action (provider parameters &optional post-func)

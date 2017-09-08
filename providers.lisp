@@ -1,7 +1,7 @@
 (in-package :clath)
 
 (defun check-for-error (parameters)
-  (alexandria:when-let
+  (when-let
       ((err (assoc :error parameters))
        (err-msg (assoc :error--description parameters)))
     (error
@@ -12,8 +12,8 @@
   `(
     :facebook
     (:string "facebook"
-             :auth-endpoint ""
-             :token-endpoint "https://graph.facebook.com/v2.10/oauth/access_token")
+     :auth-endpoint ""
+     :token-endpoint "https://graph.facebook.com/v2.10/oauth/access_token")
     :facebook
     (:string "facebook"
      :auth-endpoint "https://www.facebook.com/dialog/oauth"
