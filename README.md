@@ -1,8 +1,10 @@
-This is the stub README.txt for the "clath" project.
+# Clath
+
+Clath is single sign-on middleware for Clack. It supports basic login with OAuth1.0a, OAuth2 and OpenID Connect. 
 
 Registering OAuth apps:
 
--You need to register your website as an app with each login provider. You
+You need to register your website as an app with each login provider. You
 will be given an ID and SECRET by the login provider. When these are installed
 in the correct place in ubiquitous, authentication will become available from
 that provider.
@@ -13,7 +15,7 @@ that provider.
     > (setf (ubiquitous:value :google :client-id) "[your client id]")
     > (setf (ubiquitous:value :google :secret) "[your secret]")
 
-Hints:
+# Hints:
 
 Facebook:
 
