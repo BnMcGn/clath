@@ -56,9 +56,10 @@ login manager is developed.
           #'logout-page)
     app))
 
-(defun component (base-url)
+(defun component (base-url &key (extension "clath/"))
   (lambda (app)
-    (let ((lapp (lack.component:to-app (login-app base-url))))
+    (let ((lapp (lack.component:to-app
+                 (login-app (concatenate 'string base-url extension)))))
       (lambda (env)
         (let ((extension
                (webhax:under-path-p

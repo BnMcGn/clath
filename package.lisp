@@ -12,5 +12,6 @@
    #:*login-destination*
    #:login-url
    #:logout-url
-   #:*login-destination-hook*))
+   #:*login-destination-hook*
+   #:clath))
 
