@@ -18,12 +18,8 @@ strings."
   (with-output-to-string (s)
     (dolist (a args) (princ a s))))
 
-(defun eq-symb-case (a b)
+(defun string-equal-case (a b)
   (or (eq a b) (equal (mkstr a) (mkstr b))))
-
-(defun eq-symb (a b)
-  (or (eq-symb-case a b)
-      (equal (string-upcase (mkstr a)) (string-upcase (mkstr b)))))
 
 (defun extract-keywords (keywords alist &key in-list)
   (let ((keypairs nil)
@@ -34,10 +30,11 @@ strings."
         (currkey
          (push (cons currkey itm) keypairs)
          (setf currkey nil))
-        ((when-let ((val (find itm keywords :test #'eq-symb)))
+        ((when-let ((val (find itm keywords :test #'string-equal)))
            (setf currkey val))
          t)
-        ((and in-list (consp itm) (find (car itm) keywords :test #'eq-symb))
+        ((and in-list (consp itm)
+              (find (car itm) keywords :test #'string-equal))
          (push itm keypairs))
         (t (push itm rest))))
     (when currkey
