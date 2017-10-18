@@ -45,7 +45,8 @@
      :auth-endpoint "https://stackexchange.com/oauth"
      :token-endpoint "https://stackexchange.com/oauth/access_token"
      ;:userinfo-endpoint "https://api.stackexchange.com/2.1/me"
-     :userinfo-endpoint "https://api.stackexchange.com/2.1/me?site=stackoverflow"
+     :userinfo-endpoint
+     "https://api.stackexchange.com/2.1/me?site=stackoverflow"
      :auth-scope "")
     :twitter
     (:string "twitter"
@@ -62,7 +63,14 @@
      :auth-endpoint "https://www.linkedin.com/uas/oauth2/authorization"
      :token-endpoint "https://www.linkedin.com/uas/oauth2/accessToken"
      :userinfo-endpoint "https://api.linkedin.com/v1/people/~"
-     :auth-scope "")))
+     :auth-scope "")
+    :yahoo
+    (:string "yahoo"
+     :auth-endpoint ""
+     :token-endpoint ""
+     :userinfo-endpoint ""
+     :auth-scope ""
+     :url-string "yh")))
 
 (defparameter *provider-secrets* nil)
 
@@ -116,3 +124,4 @@
    (north:make-signed-request
     north-client
     (getf (provider-info provider) :userinfo-endpoint) :get)))
+

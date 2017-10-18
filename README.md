@@ -50,50 +50,50 @@ All of these providers require a working user account. Log in to get started.
 
 ### Facebook
 
--https://developers.facebook.com/apps/
--NOT IMPLEMENTED YET
+- https://developers.facebook.com/apps/
+- NOT IMPLEMENTED YET
 
 ### Github
 
--Settings -> OAuth applications (look under Developer settings) -> Register a new application
+- Settings -> OAuth applications (look under Developer settings) -> Register a new application
 
 ### Google
 
--Main Google documentation is here:
+- Main Google documentation is here:
 https://developers.google.com/identity/protocols/OpenIDConnect
--Actual setup happens here:
+- Actual setup happens here:
 https://console.developers.google.com/apis/credentials
 
 ### LinkedIn
 
--https://www.linkedin.com/secure/developer?newapp=
+- https://www.linkedin.com/secure/developer?newapp=
 
 ### Reddit
 
--Log in to your account
--Preferences -> Apps -> are you a developer? create an app...
+- Log in to your account
+- Preferences -> Apps -> are you a developer? create an app...
 
 ### Stackexchange
 
--https://api.stackexchange.com/
--Register For An App Key
--In addition to the Client-ID and Secret, StackExchange requires a key. Save this under :key
+- https://api.stackexchange.com/
+- Register For An App Key
+- In addition to the Client-ID and Secret, StackExchange requires a key. Save this under :key
 
     > (setf (ubiquitous:value :stackexchange :key) "[your key]")
 
 ### Twitter
 
--https://apps.twitter.com/
--Create New App
--Twitter uses OAuth1.0a, so the callback URL takes the form `https://yoursite.somewhere/clath/callback1a/twitter`
+- https://apps.twitter.com/
+- Create New App
+- Twitter uses OAuth1.0a, so the callback URL takes the form `https://yoursite.somewhere/clath/callback1a/twitter`
 
 ### Yahoo
 
--https://developer.yahoo.com/oauth/
--My Apps -> YDN apps -> Create a new app
--Note: callback URL can't have string "yahoo" in it.
--Note: callback URL must exist on public internet, so no local testing.
--NOT IMPLEMENTED YET
+- https://developer.yahoo.com/oauth/
+- My Apps -> YDN apps -> Create a new app
+- Note: callback URL can't have string "yahoo" in it.
+- Note: callback URL must exist on public internet, so no local testing.
+- NOT IMPLEMENTED YET
 
 ## Aftermath
 

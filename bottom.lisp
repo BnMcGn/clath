@@ -50,6 +50,11 @@
        string
        (string-downcase (string provider))))
 
+(defun provider-url-string (provider)
+  (if-let ((string (getf (getf *provider-info* provider) :url-string)))
+    string
+    (provider-string provider)))
+
 (defun uses-north-p (provider)
   (getf (getf *provider-info* provider) :use-north))
 
@@ -66,8 +71,8 @@
 (defun make-callback-url (provider)
   (concatenate
    'string *server-url*
-   (if (uses-north-p provider) *callback-extention-north* *callback-extension*)
-   (provider-string provider)))
+   (if (uses-north-p provider) *callback-extension-north* *callback-extension*)
+   (provider-url-string provider)))
 
 (defun available-providers ()
   (remove-if-not #'keywordp *provider-secrets*))

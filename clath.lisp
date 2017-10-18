@@ -21,7 +21,7 @@ login manager is developed.
   (initialize-secrets)
   (let ((app (make-instance 'ningle:<app>)))
     (dolist (pr (available-providers))
-      (let ((name (provider-string pr)))
+      (let ((name (provider-url-string pr)))
         (if (uses-north-p pr)
             (progn
               (setf (ningle:route
