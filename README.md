@@ -91,6 +91,7 @@ https://console.developers.google.com/apis/credentials
 
 - https://developer.yahoo.com/oauth/
 - My Apps -> YDN apps -> Create a new app
+- https://developer.yahoo.com/apps/
 - Note: callback URL can't have string "yahoo" in it.
 - Note: callback URL must exist on public internet, so no local testing.
 - NOT IMPLEMENTED YET

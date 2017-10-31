@@ -13,5 +13,7 @@
    #:login-url
    #:logout-url
    #:*login-destination-hook*
-   #:clath))
+   #:clath
+   #:provider-url-string
+   #:initialize-secrets))
 
