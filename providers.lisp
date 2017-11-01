@@ -69,7 +69,7 @@
      :auth-endpoint "https://api.login.yahoo.com/oauth2/request_auth"
      :token-endpoint "https://api.login.yahoo.com/oauth2/get_token"
      :userinfo-endpoint ""
-     :auth-scope ""
+     :auth-scope "identity"
      :url-string "yh")))
 
 (defparameter *provider-secrets* nil)

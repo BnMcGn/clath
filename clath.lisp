@@ -11,8 +11,8 @@ login manager is developed.
 (defparameter *logout-extension* "logout/")
 
 ;;;FIXME: *server-url* can't be dynamically set with let, because functions are not
-;;; called from with in the app function, but rather by the ningle app. Therefore
-;;; *server-url* is setf instead, so further instances of openid-app will stomp it.
+;;; called from within the app function, but rather by the ningle app. Therefore
+;;; *server-url* is setf instead, so further instances of login-app will stomp it.
 ;;; Single use only for now.
 
 (defun login-app (base-url)
