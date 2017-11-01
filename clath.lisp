@@ -117,17 +117,6 @@ login manager is developed.
               (:h2 "Choose a login provider")
               (str (login-links))))))))
 
-;;;FIXME: Not in use. Remove?
-(defun logged-in-page ()
-  (with-html-output-to-string (s)
-    (:html
-     (:head (:title "Logged in"))
-     (:body
-      (:h1 (str
-            (format nil "~a is logged in as ~a"
-                    (gethash :username (ningle:context :session))
-                    (gethash :display-name (ningle:context :session)))))))))
-
 (defun logout-url ()
   (concatenate 'string *openid-app-address* "/" *logout-extension*))
 
