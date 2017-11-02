@@ -12,7 +12,7 @@ OAuth1.0a support comes from [North](https://github.com/Shinmera/north)
 
 # Usage
 
-Clath runs as middleware in your Clack web application. Add this line to your app:
+Clath runs as middleware in your Clack web application. Add this line to your app *after* the session middleware:
 
     (clath:component "https://yoursite.somewhere/")
 
@@ -47,11 +47,6 @@ Terminology may vary between providers, but there will be an application or clie
 ## Hints
 
 All of these providers require a working user account. Log in to get started.
-
-### Facebook
-
-- https://developers.facebook.com/apps/
-- NOT IMPLEMENTED YET
 
 ### Github
 
@@ -92,8 +87,11 @@ https://console.developers.google.com/apis/credentials
 - https://developer.yahoo.com/oauth/
 - My Apps -> YDN apps -> Create a new app
 - https://developer.yahoo.com/apps/
-- Note: callback URL can't have string "yahoo" in it.
-- Note: callback URL must exist on public internet, so no local testing.
+- NOT IMPLEMENTED YET
+
+### Facebook
+
+- https://developers.facebook.com/apps/
 - NOT IMPLEMENTED YET
 
 ## Useables
@@ -125,7 +123,7 @@ On successful login, Clath should send the user somewhere. The mechanism to dete
 - If it is null, :clath-destination in the current session will be checked.
 - If all of these fail, Clath will redirect the user to "/"
 
-The login URL will accept a destination parameter. This is placed in the `*login-destination*` for later reference.
+The login URL will accept a destination parameter. This is placed in the `*login-destination*` for later reference. If the login URL is being generated for the logout page, the destination should probably not be set, lest the user get stuck in a loop. Clath will set `*in-logout-page*` when the logout page function is called. The code that generates the login link should check for it. 
 
 Clath will also watch for 403 responses coming from down chain and display the not-logged-in page. When it does so, it stores the current URL in the session under :clath-destination.
 
@@ -135,9 +133,32 @@ To log out, visit `/clath/logout`.
 
 ## Redecorating the Pages
 
+Clath's default login, logout and not-logged-in pages are extremely bare. You can redecorate them by redefining the clath-page-wrapper function. This is the default wrapper:
 
+>(defun clath:clath-page-wrapper (title body-func)
+>  (with-html-output-to-string (s)
+>    (:html
+>      (:head (:title title))
+>      (:body (str (funcall body-func))))))
 
-## TODO
+Your function is expected to receive a string as the first parameter and a function that takes no parameters as the second parameter. This function will return the inner content of the page as a string when called. Your function should return the complete web page as a string.
 
-- More providers are always nice. Facebook and Yahoo would be particularly nice. They were harder to work with and exceeded my debugging time budget.
+Further customization can be done to the individual pages by redefining clath-login-page, clath-logout-page and clath-not-logged-page.
+     
+# TODO
+
+- More providers are always nice. Facebook and Yahoo in particular are needed. They were harder to work with than some of the others and I have had to move on to other things.
 - There aren't provider buttons yet.
+
+# Author
+
+Ben McGunigle (bnmcgn at gmail.com)
+
+# Copyright
+
+Copyright (c) 2017 Ben McGunigle
+
+# License
+
+Apache License version 2.0
+

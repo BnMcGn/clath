@@ -70,6 +70,8 @@
      :token-endpoint "https://api.login.yahoo.com/oauth2/get_token"
      :userinfo-endpoint ""
      :auth-scope "identity"
+     ;;Yahoo at some point was failing due to a URL with the string "yahoo" in it. Hence this
+     ;; field. Yahoo is still failing, so whatever...
      :url-string "yh")))
 
 (defparameter *provider-secrets* nil)

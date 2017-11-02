@@ -94,7 +94,7 @@ login manager is developed.
                     (format s "~:(~a~)" (provider-string pr)))))))))
 
 (defun clath-page-wrapper (title body-func)
-  "Redefine this function"
+  "Redefine this function to customize the look of all Clath pages."
   (with-html-output-to-string (s)
     (:html
      (:head (:title title))
