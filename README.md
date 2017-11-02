@@ -136,6 +136,7 @@ To log out, visit `/clath/logout`.
 ## Redecorating the Pages
 
 
+
 ## TODO
 
 - More providers are always nice. Facebook and Yahoo would be particularly nice. They were harder to work with and exceeded my debugging time budget.

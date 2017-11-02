@@ -15,5 +15,8 @@
    #:*login-destination-hook*
    #:clath
    #:provider-url-string
-   #:initialize-secrets))
+   #:initialize-secrets
+   #:page-wrapper
+   #:login-page
+   #:clath-page-wrapper))
 

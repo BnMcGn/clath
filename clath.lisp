@@ -50,10 +50,10 @@ login manager is developed.
                       (callback-action pr params #'logged-in)))))))
     (setf (ningle:route app (concatenate 'string "/" *login-extension*)
                         :method :get)
-          #'login-page)
+          (lambda (params) (login-page params)))
     (setf (ningle:route app (concatenate 'string "/" *logout-extension*)
                         :method :get)
-          #'logout-page)
+          (lambda (params) (logout-page params)))
     app))
 
 (defun component (base-url &key (extension "clath/"))
@@ -93,6 +93,13 @@ login manager is developed.
        (htm (:p (:a :href (make-login-url pr)
                     (format s "~:(~a~)" (provider-string pr)))))))))
 
+(defun clath-page-wrapper (title body-func)
+  "Redefine this function"
+  (with-html-output-to-string (s)
+    (:html
+     (:head (:title title))
+     (:body (str (funcall body-func))))))
+
 (defun login-page (params)
   (when-let ((dest (assoc "destination" params :test #'equal)))
     (setf *login-destination* (cdr dest)))
@@ -102,6 +109,15 @@ login manager is developed.
      (webhax:html-out
        (:h1 "Choose a login provider")
        (str (login-links))))))
+
+(defun login-page (params)
+  (when-let ((dest (assoc "destination" params :test #'equal)))
+    (setf *login-destination* (cdr dest)))
+  (clath-page-wrapper "Login"
+                (lambda ()
+                  (with-html-output-to-string (s)
+                    (:h2 "Choose a login provider")
+                    (str (login-links))))))
 
 (defun not-logged-page (env result)
   (setf (gethash :clath-destination (getf env :lack.session))
