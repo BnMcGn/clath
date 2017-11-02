@@ -62,10 +62,10 @@ login manager is developed.
                  (login-app (concatenate 'string base-url extension)))))
       (lambda (env)
         (let ((extension
-               (webhax:under-path-p
+               (under-path-p
                 *openid-app-address* (getf env :path-info))))
           (if extension
-              (funcall lapp (webhax:repath-clack-env env extension))
+              (funcall lapp (repath-clack-env env extension))
               (let ((res (funcall app env)))
                 (if (eq 403 (car res))
                     (not-logged-page env res)
@@ -126,7 +126,7 @@ login manager is developed.
 (defun not-logged-page (env result)
   "Internal portion of clath-not-logged-page"
   (setf (gethash :clath-destination (getf env :lack.session))
-        (webhax:url-from-env env))
+        (url-from-env env))
   (list
    (car result)
    (second result)

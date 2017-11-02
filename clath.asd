@@ -14,7 +14,6 @@
                #:cljwt
                #:cl-who
                #:ubiquitous
-               #:webhax
                #:north)
   :serial t
   :components ((:file "package")

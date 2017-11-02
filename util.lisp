@@ -40,3 +40,34 @@ strings."
     (when currkey
       (push (list currkey) keypairs))
     (values (nreverse keypairs) (nreverse rest))))
+
+
+;;; Utilities borrowed from webhax-core. Webhax is a little heavy as a dependency, so these
+;;; are here for now.
+
+(defun under-path-p (path testpath)
+  (let ((len (length path)))
+    (cond
+      ((string= path testpath) "/")
+      ((and (< len (length testpath))
+            (string= testpath path :end1 len)
+            (char= (aref testpath len) #\/))
+       (subseq testpath len))
+      (t nil))))
+
+(defun repath-clack-env (env newpath)
+  (loop for (k v) on env by #'cddr
+     collect k
+     if (eq :path-info k) collect newpath
+     else collect v))
+
+(defun url-from-env (env)
+  "Extract the current request url from a clack environment."
+  (concatenate 'string
+   (format nil "~a://" (string-downcase (mkstr (or (getf env :url-scheme)
+                                                   (getf env :uri-scheme)))))
+   (getf env :server-name)
+   (when-let ((port (getf env :server-port)))
+     (unless (= 80 port)
+       (format nil ":~d" port)))
+   (getf env :request-uri)))
