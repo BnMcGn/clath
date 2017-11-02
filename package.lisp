@@ -16,7 +16,9 @@
    #:clath
    #:provider-url-string
    #:initialize-secrets
-   #:page-wrapper
-   #:login-page
-   #:clath-page-wrapper))
+   #:clath-page-wrapper
+   #:clath-login-page
+   #:clath-not-logged-page
+   #:clath-logout-page
+   #:*in-logout-page*))
 

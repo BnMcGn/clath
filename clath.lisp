@@ -100,38 +100,55 @@ login manager is developed.
      (:head (:title title))
      (:body (str (funcall body-func))))))
 
-(defun login-page (params)
-  (when-let ((dest (assoc "destination" params :test #'equal)))
-    (setf *login-destination* (cdr dest)))
-  (funcall
-   (webhax-route:quick-page
-       (:@title "Login")
-     (webhax:html-out
-       (:h1 "Choose a login provider")
-       (str (login-links))))))
-
-(defun login-page (params)
-  (when-let ((dest (assoc "destination" params :test #'equal)))
-    (setf *login-destination* (cdr dest)))
+(defun clath-login-page ()
+  "Redefine this function to customize the login page."
   (clath-page-wrapper "Login"
                 (lambda ()
                   (with-html-output-to-string (s)
                     (:h2 "Choose a login provider")
                     (str (login-links))))))
 
+(defun login-page (params)
+  "Internal portion of clath-login-page"
+  (when-let ((dest (assoc "destination" params :test #'equal)))
+    (setf *login-destination* (cdr dest)))
+  (clath-login-page))
+
+(defun clath-not-logged-page ()
+  "Redefine this function to customize the not-logged-in page."
+  (clath-page-wrapper "Please Log In"
+                      (lambda ()
+                        (with-html-output-to-string (s)
+                          (:h1 "Not logged in")
+                          (:h2 "Choose a login provider")
+                          (str (login-links))))))
+
 (defun not-logged-page (env result)
+  "Internal portion of clath-not-logged-page"
   (setf (gethash :clath-destination (getf env :lack.session))
         (webhax:url-from-env env))
   (list
    (car result)
    (second result)
    (list
-    (with-html-output-to-string (s)
-      (:html
-       (:head (:title "Please Log In"))
-       (:body (:h1 "Not logged in")
-              (:h2 "Choose a login provider")
-              (str (login-links))))))))
+    (clath-not-logged-page))))
+
+(defun clath-logout-page ()
+  "Redefine this function to customize the logout page."
+  (clath-page-wrapper "Logged Out"
+                      (lambda ()
+                        (with-html-output-to-string (s)
+                          (:h1 "Logged out")))))
+
+(defvar *in-logout-page* nil
+  "For code that implements login links. Self destination links should not be used on the logout page, lest the user get stuck in an auto-logout loop. This variable will be set when the logout page is being generated.")
+
+(defun logout-page (params)
+  (declare (ignore params))
+  (logout-action)
+  (logged-out)
+  (let ((*in-logout-page* t))
+    (clath-logout-page)))
 
 (defun logout-url ()
   (concatenate 'string *openid-app-address* "/" *logout-extension*))
@@ -139,16 +156,6 @@ login manager is developed.
 (defun login-url ()
   (concatenate 'string *openid-app-address* "/" *login-extension*))
 
-(defun logout-page (params)
-  (declare (ignore params))
-  (logout-action)
-  (logged-out)
-  (let ((webhax:*should-login-return* nil))
-    (funcall
-     (webhax:quick-page
-         (:@title "Logged out")
-       (webhax:html-out
-         (:body (:h1 "Logged out")))))))
 
 ;;FIXME: :username and :display-name extraction are getting really messy.
 ;; Should split out into different methods for providers.
