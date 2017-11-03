@@ -17,7 +17,7 @@
 ;; <http://www.gnu.org/licenses/>.
 
 (in-package #:cl-user)
-(defpackage #:cljwt
+(defpackage #:cljwt-custom
   (:use #:cl
         #:cl-base64)
   (:import-from #:alexandria
@@ -48,7 +48,7 @@
            #:mismatched-algorithms
            #:missing-algorithm))
 
-(in-package #:cljwt)
+(in-package #:cljwt-custom)
 
 (defconstant +sha256-prefix+ #(#x30 #x31 #x30 #x0d #x06 #x09 #x60 #x86 #x48 #x01 #x65 #x03 #x04 #x02 #x01 #x05 #x00 #x04 #x20))
 

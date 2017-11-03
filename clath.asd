@@ -11,7 +11,7 @@
                #:drakma
                #:flexi-streams
                #:cl-json
-               #:cljwt
+               #:cljwt-custom
                #:cl-who
                #:ubiquitous
                #:north)

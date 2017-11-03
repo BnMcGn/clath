@@ -152,8 +152,8 @@
 (defun get-id-token (atdata)
   (if-let ((itok (assoc :id--token atdata)))
     ;;FIXME: Perhaps should be downloading key and verifying JWT
-    (let ((claims (cljwt:unpack (cdr itok))))
-      (cljwt:verify-timestamps claims)
+    (let ((claims (cljwt-custom:unpack (cdr itok))))
+      (cljwt-custom:verify-timestamps claims)
       claims)
     (get-access-token atdata)))
 

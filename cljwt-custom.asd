@@ -21,7 +21,7 @@
 (in-package :cljwt-system)
 
 (defsystem cljwt-custom
-  :name "CLJWT"
+  :name "CLJWT-custom"
   :author "Grim Schjetne <grim@schjetne.se"
   :description "JSON Web Token library"
   :license "LGPLv3+"
