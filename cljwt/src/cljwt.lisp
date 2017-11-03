@@ -50,13 +50,16 @@
 
 (in-package #:cljwt-custom)
 
-(defconstant +sha256-prefix+ #(#x30 #x31 #x30 #x0d #x06 #x09 #x60 #x86 #x48 #x01 #x65 #x03 #x04 #x02 #x01 #x05 #x00 #x04 #x20))
+(unless (boundp '+sha256-prefix+)
+  (defconstant +sha256-prefix+ #(#x30 #x31 #x30 #x0d #x06 #x09 #x60 #x86 #x48 #x01 #x65 #x03 #x04 #x02 #x01 #x05 #x00 #x04 #x20)))
 
-(defconstant +rs256-padding+ (concatenate '(vector (unsigned-byte 8))
-                                          #(#x00 #x01)
-                                          (make-array '(74) :element-type '(unsigned-byte 8) :initial-element #xff)
-                                          #(#x00)
-                                          +sha256-prefix+))
+(unless (boundp '+rs256-padding+)
+  (defconstant +rs256-padding+
+    (concatenate '(vector (unsigned-byte 8))
+                 #(#x00 #x01)
+                 (make-array '(74) :element-type '(unsigned-byte 8) :initial-element #xff)
+                 #(#x00)
+                 +sha256-prefix+)))
 
 (defmacro bind-hash-tables (bindings &body body)
   `(let ,(loop for binding in bindings collect
