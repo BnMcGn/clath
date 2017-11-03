@@ -1,0 +1,31 @@
+* CLJWT
+  A library for issuing and validating JSON Web Tokens
+
+** Implemented so far
+   - Issue unsecured tokens
+   - Issue tokens secured with HS256 and RS256
+   - Decode and verify tokens
+
+** To do
+   - Additional algorithms
+   - Encrypted tokens
+   - Better abstractions
+   - Tests
+   - Documentation
+   - Release
+   - Add to Quicklisp
+
+** License
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public
+   License along with this program.  If not, see
+   <http://www.gnu.org/licenses/>.
