@@ -1,9 +1,9 @@
 ;;;; clath.asd
 
 (asdf:defsystem #:clath
-  :description "Describe clath here"
-  :author "Your Name <your.name@example.com>"
-  :license "Specify license here"
+  :description "Clath is single sign-on middleware for Clack. It allows basic login with OAuth1.0a, OAuth2 and OpenID Connect."
+  :author "Ben McGunigle <bnmcgn@gmail.com>"
+  :license "Apache License, version 2.0"
   :depends-on (#:ningle
                #:clack
                #:alexandria
