@@ -135,11 +135,11 @@ To log out, visit `/clath/logout`.
 
 Clath's default login, logout and not-logged-in pages are extremely bare. You can redecorate them by redefining the clath-page-wrapper function. This is the default wrapper:
 
->(defun clath:clath-page-wrapper (title body-func)
->  (with-html-output-to-string (s)
->    (:html
->      (:head (:title title))
->      (:body (str (funcall body-func))))))
+    (defun clath:clath-page-wrapper (title body-func)
+      (with-html-output-to-string (s)
+        (:html
+          (:head (:title title))
+          (:body (str (funcall body-func))))))
 
 Your function is expected to receive a string as the first parameter and a function that takes no parameters as the second parameter. This function will return the inner content of the page as a string when called. Your function should return the complete web page as a string.
 
