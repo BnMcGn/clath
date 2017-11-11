@@ -161,8 +161,7 @@ login manager is developed.
 ;; Should split out into different methods for providers.
 (defun logged-in ()
   (let* ((uinfo (gethash :clath-userinfo (ningle:context :session)))
-         (uname
-          (cdr (assoc-or '(:sub :id :user--id) uinfo))))
+         (uname (userinfo-get-user-id t uinfo)))
     (unless uname
       (if-let ((msg (assoc-cdr :message uinfo)))
           (error (format nil "Message from OAuth server: ~a" msg))

@@ -178,6 +178,21 @@
                dest
                "/"))))
 
+(defun userinfo-get-user-id (provider userinfo)
+  (declare (ignore provider)) ;;In future we may specialize
+  (cdr (assoc-or '(:sub :id :user--id) userinfo)))
+
+;;FIXME: Could be more generalized
+(defun try-request-user-info (provider access-token)
+  "Sometimes a newly generated access token won't instantly propagate in the provider's system, so we try a few times to give it a chance."
+  (let ((uinfo nil))
+    (dotimes (i 10)
+      (setf uinfo (request-user-info provider access-token))
+      (when (userinfo-get-user-id provider uinfo)
+        (return))
+      (sleep 1))
+    uinfo))
+
 (defun callback-action (provider parameters &optional post-func)
   (cond ((not (valid-state (assoc-cdr "state" parameters #'equal)))
          '(403 '() "Login failed. State mismatch."))
@@ -196,7 +211,7 @@
                                            :clath-id-token)
                (ningle:context :session)
              (setf clath-access-token access-token
-                   clath-userinfo (request-user-info provider access-token)
+                   clath-userinfo (try-request-user-info provider access-token)
                    clath-id-token (get-id-token at-data)))
            (when (functionp post-func) (funcall post-func))
            `(302 (:location ,(destination-on-login)))))))
