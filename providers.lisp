@@ -83,6 +83,13 @@
   (cl-json:decode-json-from-string
    (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
                         ;;Facebook might not like alt param?
+                        :parameters `(("access_token" . ,access-token))
+                        :user-agent (user-agent provider))))
+
+(defmethod request-user-info ((provider (eql :google)) access-token)
+  (cl-json:decode-json-from-string
+   (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
+                        ;;Facebook might not like alt param?
                         :parameters `(("alt" . "json")
                                       ("access_token" . ,access-token))
                         :basic-authorization (basic-authorization provider)
