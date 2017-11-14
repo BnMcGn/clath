@@ -127,11 +127,17 @@ login manager is developed.
   "Internal portion of clath-not-logged-page"
   (setf (gethash :clath-destination (getf env :lack.session))
         (url-from-env env))
+  ;; Result is the 403 page that came back from down-stack. We want to preserve the headers
+  ;; while swapping out the page body.
   (list
    (car result)
    (second result)
    (list
-    (clath-not-logged-page))))
+    ;; Generated page may have headers. If so, just take the page text.
+    (let ((page (clath-not-logged-page)))
+      (if (listp page)
+          (car (third page))
+          page)))))
 
 (defun clath-logout-page ()
   "Redefine this function to customize the logout page."
