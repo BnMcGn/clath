@@ -85,7 +85,7 @@ login manager is developed.
 
 (defun initialize-secrets ()
   (setf *provider-secrets* (secrets-from-ubiquitous))
-  t ;;Don't dump the secrets to the console when called interactively)
+  t) ;;Don't dump the secrets to the console when called interactively
 
 (defun login-links ()
   (with-html-output-to-string (s)
