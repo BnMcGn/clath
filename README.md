@@ -43,6 +43,7 @@ Terminology may vary between providers, but there will be an application or clie
     > (ubiquitous:restore 'clath:clath)
     > (setf (ubiquitous:value :google :client-id) "[your client id]")
     > (setf (ubiquitous:value :google :secret) "[your secret]")
+    > (clath:initialize-secrets)
 
 ## Hints
 
