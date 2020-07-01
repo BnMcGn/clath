@@ -20,5 +20,8 @@
    #:clath-login-page
    #:clath-not-logged-page
    #:clath-logout-page
-   #:*in-logout-page*))
+   #:*in-logout-page*
+   #:disable-provider
+   #:enable-provider
+   #:provider-disabled?))
 

@@ -75,7 +75,7 @@ login manager is developed.
   (ubiquitous:restore 'clath)
   (let ((providers (loop for (k . v) on *provider-info* by #'cddr collect k)))
     (mapcan (lambda (pr)
-              (when (ubiquitous:value pr)
+              (when (and (ubiquitous:value pr) (not (provider-disabled? pr)))
                 (list pr
                       (list* :client-id (ubiquitous:value pr :client-id)
                              :secret (ubiquitous:value pr :secret)
@@ -86,6 +86,19 @@ login manager is developed.
 (defun initialize-secrets ()
   (setf *provider-secrets* (secrets-from-ubiquitous))
   t) ;;Don't dump the secrets to the console when called interactively
+
+;;Run initialize-secrets to make an enable or disable come into effect
+(defun disable-provider (pr)
+  (ubiquitous:restore 'clath)
+  (setf (ubiquitous:value pr :disabled) t))
+
+(defun enable-provider (pr)
+  (ubiquitous:restore 'clath)
+  (ubiquitous:remvalue pr :disabled))
+
+(defun provider-disabled? (pr)
+  (ubiquitous:restore 'clath)
+  (ubiquitous:value pr :disabled))
 
 (defun login-links ()
   (with-html-output-to-string (s)
