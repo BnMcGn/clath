@@ -105,6 +105,15 @@
                            . ,(format nil "bearer ~a" access-token)))
                         :user-agent (user-agent provider))))
 
+(defmethod request-user-info ((provider (eql :github)) access-token)
+  (cl-json:decode-json-from-string
+   (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
+                        :method :get
+                        :additional-headers
+                        `(("Authorization"
+                           . ,(format nil "token ~a" access-token)))
+                        :user-agent (user-agent provider))))
+
 (defmethod request-user-info ((provider (eql :linkedin)) access-token)
   (cl-json:decode-json-from-string
    (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)

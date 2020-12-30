@@ -67,7 +67,7 @@ https://console.developers.google.com/apis/credentials
 ### Reddit
 
 - Log in to your account
-- Preferences -> Apps -> are you a developer? create an app...
+- https://www.reddit.com/prefs/apps/
 
 ### Stackexchange
 
