@@ -22,7 +22,57 @@
     (list
      :auth-endpoint (assoc-cdr :authorization--endpoint disc)
      :token-endpoint (assoc-cdr :token--endpoint disc)
-     :userinfo-endpoint (assoc-cdr :userinfo--endpoint disc))))
+     :userinfo-endpoint (assoc-cdr :userinfo--endpoint disc)
+     :jwks-uri (assoc-cdr :jwks--uri disc))))
+
+(defun get-jwk-key (jsonkey)
+  (case (cdr (assoc :kty jsonkey))
+    ("RSA" (let ((n (ironclad:octets-to-integer
+                     (jose/base64:base64url-decode (cdr (assoc :n jsonkey)))))
+                 (e (ironclad:octets-to-integer
+                     (jose/base64:base64url-decode (cdr (assoc :e jsonkey))))))
+             (ironclad:make-public-key :rsa :e e :n n)))
+    (otherwise
+     (warn "Key type not found.")
+     nil)))
+
+(defun fetch-jwks (jwks-uri)
+  (let* ((data (cl-json:decode-json-from-string (drakma:http-request jwks-uri)))
+         (res nil)
+         (algs nil)
+         (alglist '(:hs256 :hs384 :hs512 :rs256 :rs384 :rs512 :ps256 :ps384 :ps512)))
+    (dolist (key (cdr (assoc :keys data)))
+      (when-let ((kobj (get-jwk-key key))
+                 (alg (find (cdr (assoc :alg key)) alglist :test #'string-equal)))
+        (push (cons (cdr (assoc :kid key)) kobj) res)
+        (push (cons (cdr (assoc :kid key)) alg) algs)))
+    (values (nreverse res) (nreverse algs))))
+
+(defun update-jwks (provider jwks-uri)
+  (multiple-value-bind (keys algs) (fetch-jwks jwks-uri)
+    (setf (getf (getf *provider-info* provider) :keys) keys)
+    (setf (getf (getf *provider-info* provider) :algorithms) algs)))
+
+(defun get-jwk (kid provider)
+  (when-let ((key (assoc kid (getf (getf *provider-info* provider) :keys) :test #'equal)))
+    (cdr key)))
+
+(defun ensure-jwk (kid provider)
+  (or (get-jwk kid provider)
+      (progn
+        ;;Try again. Maybe there is an update...
+        (update-jwks provider (getf (getf *provider-info* provider) :jwks-uri))
+        (or (get-jwk kid provider)
+            (error "Can't find the right signing key from OpenID Connect provider")))))
+
+(defun unpack-and-check-jwt (jwt provider)
+  (let* ((tokinfo (jose:inspect-token jwt))
+         (kid (cdr (assoc "kid" tokinfo :test #'equal)))
+         (key (ensure-jwk kid provider))
+         (alg (cdr (assoc kid (getf (getf *provider-info* provider) :algorithms) :test #'equal))))
+    (if (jose:verify alg key jwt)
+        tokinfo
+        (error "Signature check failed on supplied JWT"))))
 
 ;;;FIXME: Endpoint discovery only done on startup. Should look at spec and see if it should
 ;;;happen more frequently.
@@ -33,7 +83,7 @@
         (alist-plist
          (extract-keywords
           '(:auth-endpoint :token-endpoint :userinfo-endpoint :auth-scope
-            :token-processor :access-endpoint :request-endpoint)
+            :token-processor :access-endpoint :request-endpoint :jwks-uri)
           prov))
         (progn
           (unless (getf prov :endpoints-url)
@@ -149,14 +199,10 @@
     (cdr atok)
     (cdr (assoc "access_token" atdata :test #'equal))))
 
-(defun get-id-token (atdata)
+(defun get-id-token (atdata provider)
   (if-let ((itok (assoc :id--token atdata)))
-    ;;FIXME: Perhaps should be downloading key and verifying JWT
-    (let ((claims (cljwt-custom:unpack (cdr itok))))
-      (cljwt-custom:verify-timestamps claims)
-      claims)
+    (unpack-and-check-jwt itok provider)
     (get-access-token atdata)))
-
 
 (defun valid-state (received-state)
   (and (ningle:context :session)
@@ -212,7 +258,7 @@
                (ningle:context :session)
              (setf clath-access-token access-token
                    clath-userinfo (try-request-user-info provider access-token)
-                   clath-id-token (get-id-token at-data)))
+                   clath-id-token (get-id-token at-data provider)))
            (when (functionp post-func) (funcall post-func))
            `(302 (:location ,(destination-on-login)))))))
 
