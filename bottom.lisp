@@ -26,15 +26,17 @@
      :jwks-uri (assoc-cdr :jwks--uri disc))))
 
 (defun get-jwk-key (jsonkey)
-  (case (cdr (assoc :kty jsonkey))
-    ("RSA" (let ((n (ironclad:octets-to-integer
-                     (jose/base64:base64url-decode (cdr (assoc :n jsonkey)))))
-                 (e (ironclad:octets-to-integer
-                     (jose/base64:base64url-decode (cdr (assoc :e jsonkey))))))
-             (ironclad:make-public-key :rsa :e e :n n)))
-    (otherwise
-     (warn "Key type not found.")
-     nil)))
+  (let ((kty (cdr (assoc :kty jsonkey))))
+    (cond
+      ((equal kty "RSA")
+       (let ((n (ironclad:octets-to-integer
+                 (jose/base64:base64url-decode (cdr (assoc :n jsonkey)))))
+             (e (ironclad:octets-to-integer
+                 (jose/base64:base64url-decode (cdr (assoc :e jsonkey))))))
+         (ironclad:make-public-key :rsa :e e :n n)))
+      (t
+       (warn "Key type not found.")
+       nil))))
 
 (defun fetch-jwks (jwks-uri)
   (let* ((data (cl-json:decode-json-from-string (drakma:http-request jwks-uri)))
@@ -63,7 +65,7 @@
         ;;Try again. Maybe there is an update...
         (update-jwks provider (getf (getf *provider-info* provider) :jwks-uri))
         (or (get-jwk kid provider)
-            (error "Can't find the right signing key from OpenID Connect provider")))))
+            (error "Can't find the required signing key from OpenID Connect provider")))))
 
 (defun unpack-and-check-jwt (jwt provider)
   (multiple-value-bind (tokinfo keyinfo _) (jose:inspect-token jwt)
