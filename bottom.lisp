@@ -66,13 +66,14 @@
             (error "Can't find the right signing key from OpenID Connect provider")))))
 
 (defun unpack-and-check-jwt (jwt provider)
-  (let* ((tokinfo (jose:inspect-token jwt))
-         (kid (cdr (assoc "kid" tokinfo :test #'equal)))
-         (key (ensure-jwk kid provider))
-         (alg (cdr (assoc kid (getf (getf *provider-info* provider) :algorithms) :test #'equal))))
-    (if (jose:verify alg key jwt)
-        tokinfo
-        (error "Signature check failed on supplied JWT"))))
+  (multiple-value-bind (tokinfo keyinfo _) (jose:inspect-token jwt)
+    (declare (ignore _))
+    (let* ((kid (cdr (assoc "kid" keyinfo :test #'equal)))
+           (key (ensure-jwk kid provider))
+           (alg (cdr (assoc kid (getf (getf *provider-info* provider) :algorithms) :test #'equal))))
+      (if (jose:verify alg key jwt)
+          tokinfo
+          (error "Signature check failed on supplied JWT")))))
 
 ;;;FIXME: Endpoint discovery only done on startup. Should look at spec and see if it should
 ;;;happen more frequently.
@@ -201,7 +202,7 @@
 
 (defun get-id-token (atdata provider)
   (if-let ((itok (assoc :id--token atdata)))
-    (unpack-and-check-jwt itok provider)
+    (unpack-and-check-jwt (cdr itok) provider)
     (get-access-token atdata)))
 
 (defun valid-state (received-state)

@@ -12,6 +12,7 @@
                #:flexi-streams
                #:cl-json
                #:jose
+               #:ironclad
                #:cl-who
                #:ubiquitous
                #:north)

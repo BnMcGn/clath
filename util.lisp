@@ -30,8 +30,9 @@ strings."
         (currkey
          (push (cons currkey itm) keypairs)
          (setf currkey nil))
-        ((when-let ((val (find itm keywords :test #'string-equal)))
-           (setf currkey val))
+        ((and (or (stringp itm) (symbolp itm))
+              (when-let ((val (find itm keywords :test #'string-equal)))
+                (setf currkey val)))
          t)
         ((and in-list (consp itm)
               (find (car itm) keywords :test #'string-equal))
