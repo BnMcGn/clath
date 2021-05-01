@@ -1,6 +1,0 @@
-Clath needs an updated version of cljwt. Grim Schjetne, author of cljwt, intends to update it. The updated version is included here in the cljwt folder until the main branch gets reworked. This seems simpler than publishing an alternate version of cljwt on quicklisp.
-
-Clath's local version of cljwt will be loaded under the package cljwt-custom to avoid any chance clashes with the main version.
-
-Original: https://github.com/gschjetne/cljwt
-Updated fork: https://github.com/BnMcGn/cljwt
