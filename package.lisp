@@ -23,5 +23,6 @@
    #:*in-logout-page*
    #:disable-provider
    #:enable-provider
-   #:provider-disabled?))
+   #:provider-disabled?
+   #:login-links))
 
