@@ -18,7 +18,9 @@ Clath runs as middleware in your Clack web application. Add this line to your ap
 
 The first parameter is your server URL, which Clath needs to know. The :extension keyword argument, which defaults to "clath/", determines where Clath will mount.
 
-Visit "/clath/login" on your server to see a list of working providers. Initially this will be empty.
+If you are using Caveman2, it is probably best to add this to your `app.lisp` file immediately after the line with `:session`.
+
+Visit "/clath/login/" on your server to see a list of working providers. Initially this will be empty.
 
 ## Registering with Providers
 
