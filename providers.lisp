@@ -62,8 +62,9 @@
      "linkedin"
      :auth-endpoint "https://www.linkedin.com/uas/oauth2/authorization"
      :token-endpoint "https://www.linkedin.com/uas/oauth2/accessToken"
-     :userinfo-endpoint "https://api.linkedin.com/v1/people/~"
-     :auth-scope "")
+     :userinfo-endpoint "https://api.linkedin.com/v2/userinfo"
+     :jwks-uri "https://www.linkedin.com/oauth/openid/jwks"
+     :auth-scope "openid email")
     :yahoo
     (:string "yahoo"
      :auth-endpoint "https://api.login.yahoo.com/oauth2/request_auth"
@@ -117,8 +118,7 @@
 (defmethod request-user-info ((provider (eql :linkedin)) access-token)
   (cl-json:decode-json-from-string
    (drakma:http-request (getf (provider-info provider) :userinfo-endpoint)
-                        :parameters `(("oauth2_access_token" . ,access-token)
-                                      ("format" . "json"))
+                        :parameters `(("oauth2_access_token" . ,access-token))
                         :method :get
                         :user-agent (user-agent provider))))
 
