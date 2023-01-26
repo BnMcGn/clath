@@ -67,7 +67,7 @@ login manager is developed.
           (if extension
               (funcall lapp (repath-clack-env env extension))
               (let ((res (funcall app env)))
-                (if (eq 403 (car res))
+                (if (and (consp res) (eql 403 (car res)))
                     (not-logged-page env res)
                     res))))))))
 
