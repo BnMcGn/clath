@@ -45,7 +45,9 @@
          (alglist '(:hs256 :hs384 :hs512 :rs256 :rs384 :rs512 :ps256 :ps384 :ps512)))
     (dolist (key (cdr (assoc :keys data)))
       (when-let ((kobj (get-jwk-key key))
-                 (alg (find (cdr (assoc :alg key)) alglist :test #'string-equal)))
+                 (alg (or
+                       (find (cdr (assoc :alg key)) alglist :test #'string-equal)
+                       :rs256)))
         (push (cons (cdr (assoc :kid key)) kobj) res)
         (push (cons (cdr (assoc :kid key)) alg) algs)))
     (values (nreverse res) (nreverse algs))))
