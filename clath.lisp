@@ -125,7 +125,7 @@ login manager is developed.
 (defun login-page (params)
   "Internal portion of clath-login-page"
   (when-let ((dest (assoc "destination" params :test #'equal)))
-    (setf *login-destination* (cdr dest)))
+    (setf (gethash :clath-destination (ningle:context :session)) (cdr dest)))
   (clath-login-page))
 
 (defun clath-not-logged-page ()

@@ -131,7 +131,7 @@
   (remove-if-not #'keywordp *provider-secrets*))
 
 ;;;FIXME: Audit me: this number is probably correct/random enough, because the public
-;;;*probably* never sees it. Should get a knowledgable opionion on it though.
+;;;*probably* never sees it. Should get a knowledgable opinion on it though.
 (defun gen-state (len)
   (with-output-to-string (stream)
     (let ((*print-base* 36))
