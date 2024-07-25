@@ -10,13 +10,7 @@ login manager is developed.
 (defparameter *openid-app-address* "/clath")
 (defparameter *logout-extension* "logout/")
 
-;;;FIXME: *server-url* can't be dynamically set with let, because functions are not
-;;; called from within the app function, but rather by the ningle app. Therefore
-;;; *server-url* is setf instead, so further instances of login-app will stomp it.
-;;; Single use only for now.
-
 (defun login-app (base-url)
-  (setf *server-url* base-url)
   ;;FIXME: Doesn't work first time this is called.
   (initialize-secrets)
   (let ((app (make-instance 'ningle:<app>)))
@@ -29,31 +23,39 @@ login manager is developed.
                      :method :get)
                     (lambda (params)
                       (declare (ignore params))
-                      (login-action-north pr)))
+                      (let ((*server-url* base-url))
+                        (login-action-north pr))))
               (setf (ningle:route
                      app
                      (concatenate 'string "/" *callback-extension-north* name)
                      :method :get)
                     (lambda (params)
-                      (callback-action-north pr params #'logged-in))))
+                      (let ((*server-url* base-url))
+                        (callback-action-north pr params #'logged-in)))))
             (progn
               (setf (ningle:route
                      app (concatenate 'string "/" *login-extension* name)
                      :method :get)
                     (lambda (params)
                       (declare (ignore params))
-                      (login-action pr)))
+                      (let ((*server-url* base-url))
+                        (login-action pr))))
               (setf (ningle:route
                      app (concatenate 'string "/" *callback-extension* name)
                     :method :get)
                     (lambda (params)
-                      (callback-action pr params #'logged-in)))))))
+                      (let ((*server-url* base-url))
+                        (callback-action pr params #'logged-in))))))))
     (setf (ningle:route app (concatenate 'string "/" *login-extension*)
                         :method :get)
-          (lambda (params) (login-page params)))
+          (lambda (params)
+            (let ((*server-url* base-url))
+              (login-page params))))
     (setf (ningle:route app (concatenate 'string "/" *logout-extension*)
                         :method :get)
-          (lambda (params) (logout-page params)))
+          (lambda (params)
+            (let ((*server-url* base-url))
+              (logout-page params))))
     app))
 
 (defun component (base-url &key (extension "clath/"))

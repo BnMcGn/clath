@@ -220,7 +220,8 @@
 (defun destination-on-login ()
   (if (functionp *login-destination-hook*)
       (funcall *login-destination-hook*
-               :username (gethash :username (ningle:context :session)))
+               :username (gethash :username (ningle:context :session))
+               :session (ningle:context :session))
       (if *login-destination* *login-destination*
           (if-let ((dest (gethash :clath-destination
                               (ningle:context :session))))
@@ -256,8 +257,7 @@
            (when (assoc :error at-data)
              (error (format nil "Error message from OAuth server: ~a"
                             (assoc-cdr :message at-data))))
-           (with-keys (:clath-access-token :clath-userinfo
-                                           :clath-id-token)
+           (with-keys (:clath-access-token :clath-userinfo :clath-id-token)
                (ningle:context :session)
              (setf clath-access-token access-token
                    clath-userinfo (try-request-user-info provider access-token)

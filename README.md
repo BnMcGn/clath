@@ -115,18 +115,18 @@ Clath attempts to guess what display name the user will prefer based on various 
 
 ### :clath-userinfo
 
-An assoc-list containing the parsed raw output from the userinfo request. In the world of 3rd party authentication creativity rather than consistency is the preeminent virtue. Extracting meaningful information from the uniquely named fields of each provider is an adventure. Mostly, you should be able to leave this field alone. 
+An assoc-list containing the parsed raw output from the userinfo request. In the world of 3rd party authentication creativity rather than consistency is the preeminent virtue. Extracting meaningful information from the uniquely named fields of each provider is an adventure. Mostly, you should be able to leave this field alone.
 
 ## Destination on Login
 
 On successful login, Clath should send the user somewhere. The mechanism to determine this location is hacked together, has some issues, and may change in the future. For now:
 
-- If `*login-destination-hook*` contains a function, the user's identity will be passed to that function as the :username keyword. The user will be redirected to the URL returned by the function.
+- If `*login-destination-hook*` contains a function, the user's identity will be passed to that function as the :username keyword and the session will be passed in :session. The user will be redirected to the URL returned by the function.
 - Next, `*login-destination*` will be checked.
 - If it is null, :clath-destination in the current session will be checked.
 - If all of these fail, Clath will redirect the user to "/"
 
-The login URL will accept a destination parameter. This is placed in the `*login-destination*` for later reference. If the login URL is being generated for the logout page, the destination should probably not be set, lest the user get stuck in a loop. Clath will set `*in-logout-page*` when the logout page function is called. The code that generates the login link should check for it. 
+The login URL will accept a destination parameter. This is placed in the `*login-destination*` for later reference. If the login URL is being generated for the logout page, the destination should probably not be set, lest the user get stuck in a loop. Clath will set `*in-logout-page*` when the logout page function is called. The code that generates the login link should check for it.
 
 Clath will also watch for 403 responses coming from down chain and display the not-logged-in page. When it does so, it stores the current URL in the session under :clath-destination.
 
@@ -147,7 +147,7 @@ Clath's default login, logout and not-logged-in pages are extremely bare. You ca
 Your function is expected to receive a string as the first parameter and a function that takes no parameters as the second parameter. This function will return the inner content of the page as a string when called. Your function should return the complete web page as a string.
 
 Further customization can be done to the individual pages by redefining clath-login-page, clath-logout-page and clath-not-logged-page.
-     
+
 # TODO
 
 - More providers are always nice. Facebook and Yahoo in particular are needed. They were harder to work with than some of the others and I have had to move on to other things.
@@ -159,7 +159,7 @@ Ben McGunigle (bnmcgn at gmail.com)
 
 # Copyright
 
-Copyright (c) 2017 Ben McGunigle
+Copyright (c) 2017-2024 Ben McGunigle
 
 # License
 
