@@ -148,9 +148,29 @@
     (&key auth-scope client-id auth-endpoint state redirect-uri &allow-other-keys)
   (drakma:http-request
    auth-endpoint :redirect nil
-   :parameters `(("client_id" . ,client-id) ("app_id" . ,client-id)
-                 ("response_type" . "code") ("scope" . ,auth-scope)
-                 ("redirect_uri" . ,redirect-uri) ("state" . ,state))))
+   :parameters
+   `(("app_id" . ,client-id) ("client_id" . ,client-id)
+     ("redirect_uri" . ,redirect-uri) ("response_type" . "code")
+     ("scope" . ,auth-scope) ("state" . ,state))))
+
+;;Only used by OAuth-1-ish providers
+(defun request-request-token (provider)
+  (let* ((info (provider-info provider))
+         (reqend (getf info :request-endpoint)))
+    (when reqend
+     (multiple-value-bind (response code headers)
+        (drakma:http-request
+         reqend
+         :method :post
+         :redirect nil
+         :user-agent (user-agent provider)
+         ;:basic-authorization (basic-authorization provider)
+         :parameters `(("oauth_callback" . ,(make-callback-url provider))))
+      (declare (ignore code))
+      (let ((subtype (nth-value 1 (drakma:get-content-type headers))))
+        (print subtype)
+        response
+        )) )))
 
 ;;;WARNING: Function saves state to session!
 (defun login-action (provider)
@@ -165,6 +185,10 @@
                :client-id (getf (provider-secrets provider) :client-id)
                (provider-info provider))
       (declare (ignore headers))
+      (print "in login-actoin")
+      (print content)
+      (print resp-code)
+      (print uri)
       (if (< resp-code 400) `(302 (:location ,(format nil "~a" uri)))
           content))))
 

@@ -85,6 +85,10 @@ https://console.developers.google.com/apis/credentials
 - Create New App
 - Twitter uses OAuth1.0a, so the callback URL takes the form `https://yoursite.somewhere/clath/callback1a/twitter`
 
+### X.com
+
+- https://developer.x.com/en/portal/dashboard
+- Projects & Apps -> Add Project 
 ### Yahoo
 
 - https://developer.yahoo.com/oauth/

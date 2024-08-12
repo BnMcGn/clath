@@ -57,6 +57,16 @@
      :userinfo-endpoint
      "https://api.twitter.com/1.1/account/verify_credentials.json"
      :auth-scope "")
+    :x.com
+    (:string "x.com"
+     :use-north t
+     :auth-endpoint "https://api.twitter.com/oauth/authorize"
+     :token-endpoint "https://api.twitter.com/oauth/access_token"
+     ;:access-endpoint "https://api.twitter.com/oauth/access_token"
+     :request-endpoint "https://api.twitter.com/oauth/request_token"
+     :userinfo-endpoint
+     "https://api.twitter.com/1.1/account/verify_credentials.json"
+     :auth-scope "")
     :linkedin
     (:string
      "linkedin"
