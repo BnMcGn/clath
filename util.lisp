@@ -52,15 +52,15 @@ strings."
       ((string= path testpath) "/")
       ((and (< len (length testpath))
             (string= testpath path :end1 len)
-            (char= (aref testpath len) #\/))
-       (subseq testpath len))
+            (char= (aref testpath (1- len)) #\/))
+       (subseq testpath (1- len)))
       (t nil))))
 
 (defun repath-clack-env (env newpath)
   (loop for (k v) on env by #'cddr
-     collect k
-     if (eq :path-info k) collect newpath
-     else collect v))
+        collect k
+        if (eq :path-info k) collect newpath
+          else collect v))
 
 (defun url-from-env (env)
   "Extract the current request url from a clack environment."

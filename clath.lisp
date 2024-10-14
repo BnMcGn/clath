@@ -7,7 +7,7 @@ login manager is developed.
 
 |#
 
-(defparameter *clath-app-address* "/clath")
+(defparameter *clath-app-address* "clath/")
 (defparameter *logout-extension* "logout/")
 
 (defun login-app (base-url app-address)
@@ -71,7 +71,7 @@ login manager is developed.
       (lambda (env)
         (let ((in-app
                (under-path-p
-                extension (getf env :path-info))))
+                (concatenate 'string "/" extension) (getf env :path-info))))
           (if in-app
               (funcall lapp (repath-clack-env env in-app))
               (let* ((*clath-app-address* extension)
@@ -180,10 +180,10 @@ login manager is developed.
     (clath-logout-page)))
 
 (defun logout-url ()
-  (concatenate 'string *clath-app-address* "/" *logout-extension*))
+  (concatenate 'string "/" *clath-app-address* *logout-extension*))
 
 (defun login-url ()
-  (concatenate 'string *clath-app-address* "/" *login-extension*))
+  (concatenate 'string "/" *clath-app-address* *login-extension*))
 
 
 ;;FIXME: :username and :display-name extraction are getting really messy.
