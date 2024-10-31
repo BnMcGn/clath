@@ -66,10 +66,12 @@ login manager is developed.
 
 (defun component (base-url &key (extension *clath-app-address*))
   (lambda (app)
-    (let ((lapp (lack.component:to-app
-                 (login-app (concatenate 'string base-url extension) extension))))
+    (let* ((server-url (concatenate 'string base-url extension))
+           (lapp (lack.component:to-app
+                  (login-app server-url extension))))
       (lambda (env)
-        (let ((in-app
+        (let ((*server-url* server-url)
+              (in-app
                (under-path-p
                 (concatenate 'string "/" extension) (getf env :path-info))))
           (if in-app
