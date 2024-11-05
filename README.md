@@ -85,16 +85,15 @@ https://console.developers.google.com/apis/credentials
 - Create New App
 - Twitter uses OAuth1.0a, so the callback URL takes the form `https://yoursite.somewhere/clath/callback1a/twitter`
 
+### Facebook
+
+- https://developers.facebook.com/apps/
+
 ### Yahoo
 
 - https://developer.yahoo.com/oauth/
 - My Apps -> YDN apps -> Create a new app
 - https://developer.yahoo.com/apps/
-- NOT IMPLEMENTED YET
-
-### Facebook
-
-- https://developers.facebook.com/apps/
 - NOT IMPLEMENTED YET
 
 ## Useables
@@ -150,7 +149,7 @@ Further customization can be done to the individual pages by redefining clath-lo
 
 # TODO
 
-- More providers are always nice. Facebook and Yahoo in particular are needed. They were harder to work with than some of the others and I have had to move on to other things.
+- More providers are always nice. 
 - There aren't provider buttons yet.
 
 # Author

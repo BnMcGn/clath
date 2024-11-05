@@ -12,15 +12,10 @@
   `(
     :facebook
     (:string "facebook"
-     :auth-endpoint ""
-     :token-endpoint "https://graph.facebook.com/v2.10/oauth/access_token")
-    :facebook
-    (:string "facebook"
-     :auth-endpoint "https://www.facebook.com/dialog/oauth"
-     :token-endpoint "https://graph.facebook.com/v2.3/oauth/access_token"
+     :auth-endpoint "https://www.facebook.com/v20.0/dialog/oauth"
+     :token-endpoint "https://graph.facebook.com/v20.0/oauth/access_token"
      :userinfo-endpoint "https://graph.facebook.com/v2.3/me"
-     :auth-scope "email"
-     :redirect-uri)
+     :auth-scope "public_profile")
     :google
     (:string "google"
      :endpoints-url
