@@ -7,10 +7,10 @@ login manager is developed.
 
 |#
 
-(defparameter *openid-app-address* "/clath")
+(defparameter *clath-app-address* "clath/")
 (defparameter *logout-extension* "logout/")
 
-(defun login-app (base-url)
+(defun login-app (base-url app-address)
   ;;FIXME: Doesn't work first time this is called.
   (initialize-secrets)
   (let ((app (make-instance 'ningle:<app>)))
@@ -23,14 +23,16 @@ login manager is developed.
                      :method :get)
                     (lambda (params)
                       (declare (ignore params))
-                      (let ((*server-url* base-url))
+                      (let ((*server-url* base-url)
+                            (*clath-app-address* app-address))
                         (login-action-north pr))))
               (setf (ningle:route
                      app
                      (concatenate 'string "/" *callback-extension-north* name)
                      :method :get)
                     (lambda (params)
-                      (let ((*server-url* base-url))
+                      (let ((*server-url* base-url)
+                            (*clath-app-address* app-address))
                         (callback-action-north pr params #'logged-in)))))
             (progn
               (setf (ningle:route
@@ -38,37 +40,44 @@ login manager is developed.
                      :method :get)
                     (lambda (params)
                       (declare (ignore params))
-                      (let ((*server-url* base-url))
+                      (let ((*server-url* base-url)
+                            (*clath-app-address* app-address))
                         (login-action pr))))
               (setf (ningle:route
                      app (concatenate 'string "/" *callback-extension* name)
                     :method :get)
                     (lambda (params)
-                      (let ((*server-url* base-url))
+                      (let ((*server-url* base-url)
+                            (*clath-app-address* app-address))
                         (callback-action pr params #'logged-in))))))))
     (setf (ningle:route app (concatenate 'string "/" *login-extension*)
                         :method :get)
           (lambda (params)
-            (let ((*server-url* base-url))
+            (let ((*server-url* base-url)
+                  (*clath-app-address* app-address))
               (login-page params))))
     (setf (ningle:route app (concatenate 'string "/" *logout-extension*)
                         :method :get)
           (lambda (params)
-            (let ((*server-url* base-url))
+            (let ((*server-url* base-url)
+                  (*clath-app-address* app-address))
               (logout-page params))))
     app))
 
-(defun component (base-url &key (extension "clath/"))
+(defun component (base-url &key (extension *clath-app-address*))
   (lambda (app)
-    (let ((lapp (lack.component:to-app
-                 (login-app (concatenate 'string base-url extension)))))
+    (let* ((server-url (concatenate 'string base-url extension))
+           (lapp (lack.component:to-app
+                  (login-app server-url extension))))
       (lambda (env)
-        (let ((extension
+        (let ((*server-url* server-url)
+              (in-app
                (under-path-p
-                *openid-app-address* (getf env :path-info))))
-          (if extension
-              (funcall lapp (repath-clack-env env extension))
-              (let ((res (funcall app env)))
+                (concatenate 'string "/" extension) (getf env :path-info))))
+          (if in-app
+              (funcall lapp (repath-clack-env env in-app))
+              (let* ((*clath-app-address* extension)
+                     (res (funcall app env)))
                 (if (and (consp res) (eql 403 (car res)))
                     (not-logged-page env res)
                     res))))))))
@@ -173,10 +182,10 @@ login manager is developed.
     (clath-logout-page)))
 
 (defun logout-url ()
-  (concatenate 'string *openid-app-address* "/" *logout-extension*))
+  (concatenate 'string "/" *clath-app-address* *logout-extension*))
 
 (defun login-url ()
-  (concatenate 'string *openid-app-address* "/" *login-extension*))
+  (concatenate 'string "/" *clath-app-address* *login-extension*))
 
 
 ;;FIXME: :username and :display-name extraction are getting really messy.
