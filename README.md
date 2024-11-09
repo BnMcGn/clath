@@ -81,14 +81,10 @@ https://console.developers.google.com/apis/credentials
 
 ### Twitter
 
-- https://apps.twitter.com/
-- Create New App
-- Twitter uses OAuth1.0a, so the callback URL takes the form `https://yoursite.somewhere/clath/callback1a/twitter`
-
-### X.com
-
 - https://developer.x.com/en/portal/dashboard
-- Projects & Apps -> Add Project 
+- Projects & Apps -> Add Project
+- Save the API (consumer) key and secret as `:client-id` and `:secret`.
+- Twitter uses OAuth1.0a, so the callback URL takes the form `https://yoursite.somewhere/clath/callback1a/twitter`
 
 ### Facebook
 
