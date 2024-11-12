@@ -111,18 +111,47 @@ login manager is developed.
   (ubiquitous:restore 'clath)
   (ubiquitous:value pr :disabled))
 
+(defparameter *provider-icon-size* "25px")
+(defparameter *provider-button-css*
+  "padding: 1px 10px;
+    border: 1px outset buttonborder;
+    border-radius: 3px;
+    color: buttontext;
+    background-color: buttonface;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    width: 17rem;
+    height: 2.5rem;")
+
+(defparameter *provider-container-css*
+  " .provider-container svg {
+width:25px;
+height:25px;
+display:inline;
+}")
+
 (defun login-links ()
   (with-html-output-to-string (s)
     (:div
      (dolist (pr (available-providers))
-       (htm (:p (:a :href (make-login-url pr)
-                    (format s "~:(~a~)" (provider-string pr)))))))))
+       (when-let ((ifile (provider-icon pr)))
+         (htm (:div
+               :style "margin: 0.5rem;"
+               (:a :href (make-login-url pr)
+                   :class "provider-container"
+                   :style *provider-button-css*
+                   (str (alexandria:read-file-into-string ifile))
+                   (:span
+                    :style "display: flex; justify-content: center; flex-grow: 1;"
+                    (str (format nil "Sign in with ~a" (provider-string pr))))))))))))
 
 (defun clath-page-wrapper (title body-func)
   "Redefine this function to customize the look of all Clath pages."
   (with-html-output-to-string (s)
     (:html
-     (:head (:title title))
+     (:head (:title title)
+            (:style :type "text/css" (str *provider-container-css*)))
      (:body (str (funcall body-func))))))
 
 (defun clath-login-page ()

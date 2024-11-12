@@ -11,64 +11,72 @@
 (defparameter *provider-info*
   `(
     :facebook
-    (:string "facebook"
+    (:string "Facebook"
      :auth-endpoint "https://www.facebook.com/v20.0/dialog/oauth"
      :token-endpoint "https://graph.facebook.com/v20.0/oauth/access_token"
      :userinfo-endpoint "https://graph.facebook.com/v2.3/me"
-     :auth-scope "public_profile")
+     :auth-scope "public_profile"
+     :fontawesome-icon "facebook")
     :google
-    (:string "google"
+    (:string "Google"
      :endpoints-url
      "https://accounts.google.com/.well-known/openid-configuration"
-     :auth-scope "openid profile email")
+     :auth-scope "openid profile email"
+     :fontawesome-icon "google")
     :github
-    (:string "github"
+    (:string "Github"
      :auth-endpoint "https://github.com/login/oauth/authorize"
      :token-endpoint "https://github.com/login/oauth/access_token"
      :userinfo-endpoint "https://api.github.com/user"
      ;;FIXME: email endpoint not implemented yet.
      :email-endpoint "https://api.github.com/user/emails"
-     :auth-scope "")
+     :auth-scope ""
+     :fontawesome-icon "github")
     :reddit
-    (:string "reddit"
+    (:string "Reddit"
      :auth-endpoint "https://www.reddit.com/api/v1/authorize"
      :token-endpoint "https://www.reddit.com/api/v1/access_token"
      :userinfo-endpoint "https://oauth.reddit.com/api/v1/me"
-     :auth-scope "identity")
+     :auth-scope "identity"
+     :fontawesome-icon "reddit")
     :stackexchange
-    (:string "stackexchange"
+    (:string "Stack Exchange"
      :auth-endpoint "https://stackexchange.com/oauth"
      :token-endpoint "https://stackexchange.com/oauth/access_token"
      ;:userinfo-endpoint "https://api.stackexchange.com/2.1/me"
      :userinfo-endpoint
      "https://api.stackexchange.com/2.1/me?site=stackoverflow"
-     :auth-scope "")
+     :auth-scope ""
+     :fontawesome-icon "stack-exchange")
     :twitter
-    (:string "twitter"
+    (:string "X.com"
      :use-north t
      :auth-endpoint "https://api.twitter.com/oauth/authorize"
      :access-endpoint "https://api.twitter.com/oauth/access_token"
      :request-endpoint "https://api.twitter.com/oauth/request_token"
      :userinfo-endpoint
      "https://api.twitter.com/1.1/account/verify_credentials.json"
-     :auth-scope "")
+     :auth-scope ""
+     :fontawesome-icon "x-twitter")
     :linkedin
     (:string
-     "linkedin"
+     "LinkedIn"
      :auth-endpoint "https://www.linkedin.com/uas/oauth2/authorization"
      :token-endpoint "https://www.linkedin.com/uas/oauth2/accessToken"
      :userinfo-endpoint "https://api.linkedin.com/v2/userinfo"
      :jwks-uri "https://www.linkedin.com/oauth/openid/jwks"
-     :auth-scope "openid email")
+     :auth-scope "openid email"
+     :fontawesome-icon "linkedin")
     :yahoo
-    (:string "yahoo"
+    (:string "Yahoo"
      :auth-endpoint "https://api.login.yahoo.com/oauth2/request_auth"
      :token-endpoint "https://api.login.yahoo.com/oauth2/get_token"
      :userinfo-endpoint ""
      :auth-scope "identity"
      ;;Yahoo at some point was failing due to a URL with the string "yahoo" in it. Hence this
      ;; field. Yahoo is still failing, so whatever...
-     :url-string "yh")))
+     :url-string "yh"
+     :fontawesome-icon "yahoo")))
 
 (defparameter *provider-secrets* nil)
 

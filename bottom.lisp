@@ -105,6 +105,12 @@
        string
        (string-downcase (string provider))))
 
+(defun provider-icon (provider)
+  (let ((name (getf (getf *provider-info* provider) :fontawesome-icon)))
+    (when name (asdf:system-relative-pathname
+                'clath
+                (gadgets:strcat "icons/" name ".svg")))))
+
 (defun provider-url-string (provider)
   (if-let ((string (getf (getf *provider-info* provider) :url-string)))
     string

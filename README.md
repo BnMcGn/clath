@@ -148,10 +148,11 @@ Your function is expected to receive a string as the first parameter and a funct
 
 Further customization can be done to the individual pages by redefining clath-login-page, clath-logout-page and clath-not-logged-page.
 
+Clath uses svg icons from [fontawesome](https://use.fontawesome.com/releases/v6.6.0/fontawesome-free-6.6.0-desktop.zip).
+
 # TODO
 
 - More providers are always nice. 
-- There aren't provider buttons yet.
 
 # Author
 
