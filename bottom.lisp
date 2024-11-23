@@ -114,7 +114,7 @@
 (defun provider-url-string (provider)
   (if-let ((string (getf (getf *provider-info* provider) :url-string)))
     string
-    (provider-string provider)))
+    (string-downcase (provider-string provider))))
 
 (defun uses-north-p (provider)
   (getf (getf *provider-info* provider) :use-north))
@@ -127,7 +127,7 @@
   (concatenate
    'string *server-url*
    (if (uses-north-p provider) *login-extension-north* *login-extension*)
-   (provider-string provider)))
+   (provider-url-string provider)))
 
 (defun make-callback-url (provider)
   (concatenate
@@ -191,10 +191,6 @@
                :client-id (getf (provider-secrets provider) :client-id)
                (provider-info provider))
       (declare (ignore headers))
-      (print "in login-actoin")
-      (print content)
-      (print resp-code)
-      (print uri)
       (if (< resp-code 400) `(302 (:location ,(format nil "~a" uri)))
           content))))
 

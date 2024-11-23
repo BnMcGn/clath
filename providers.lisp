@@ -47,6 +47,7 @@
      :userinfo-endpoint
      "https://api.stackexchange.com/2.1/me?site=stackoverflow"
      :auth-scope ""
+     :url-string "stackexchange"
      :fontawesome-icon "stack-exchange")
     :twitter
     (:string "X.com"
