@@ -1,10 +1,10 @@
 (in-package :clath)
 
 (defparameter *callback-extension* "callback/")
-(defparameter *login-extension* "login/")
+(defparameter *login-extension* "login")
 ;;Because north supports oauth 1.0a
 (defparameter *callback-extension-north* "callback1a/")
-(defparameter *login-extension-north* "login1a/")
+(defparameter *login-extension-north* "login1a")
 (defvar *server-url*)
 
 (defparameter *clath-version* "0.1")
@@ -127,6 +127,7 @@
   (concatenate
    'string *server-url*
    (if (uses-north-p provider) *login-extension-north* *login-extension*)
+   "/"
    (provider-url-string provider)))
 
 (defun make-callback-url (provider)
@@ -148,7 +149,7 @@
 
 (defun special-url-p (url-path)
   (or (sequence-starts-with (concatenate 'string "/" *callback-extension*) url-path)
-      (sequence-starts-with (concatenate 'string "/" *login-extension*) url-path)))
+      (sequence-starts-with (concatenate 'string "/" *login-extension* "/") url-path)))
 
 (defun request-user-auth-destination
     (&key auth-scope client-id auth-endpoint state redirect-uri &allow-other-keys)

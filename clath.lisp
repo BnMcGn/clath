@@ -19,7 +19,7 @@ login manager is developed.
         (if (uses-north-p pr)
             (progn
               (setf (ningle:route
-                     app (concatenate 'string "/" *login-extension-north* name)
+                     app (concatenate 'string "/" *login-extension-north* "/" name)
                      :method :get)
                     (lambda (params)
                       (declare (ignore params))
@@ -36,7 +36,7 @@ login manager is developed.
                         (callback-action-north pr params #'logged-in)))))
             (progn
               (setf (ningle:route
-                     app (concatenate 'string "/" *login-extension* name)
+                     app (concatenate 'string "/" *login-extension* "/" name)
                      :method :get)
                     (lambda (params)
                       (declare (ignore params))
@@ -56,6 +56,12 @@ login manager is developed.
             (let ((*server-url* base-url)
                   (*clath-app-address* app-address))
               (login-page params))))
+    (setf (ningle:route app (concatenate 'string "/" *login-extension* "/")
+                        :method :get)
+          (lambda (params)
+            (let ((*server-url* base-url)
+                  (*clath-app-address* app-address))
+              (login-page params))))
     (setf (ningle:route app (concatenate 'string "/" *logout-extension*)
                         :method :get)
           (lambda (params)
@@ -65,6 +71,8 @@ login manager is developed.
     app))
 
 (defun component (base-url &key (extension *clath-app-address*))
+  (unless (eq #\/ (car (last (coerce base-url 'list))))
+    (warn "Clath base url should end with a '/'"))
   (lambda (app)
     (let* ((server-url (concatenate 'string base-url extension))
            (lapp (lack.component:to-app
@@ -214,7 +222,7 @@ display:inline;
   (concatenate 'string "/" *clath-app-address* *logout-extension*))
 
 (defun login-url ()
-  (concatenate 'string "/" *clath-app-address* *login-extension*))
+  (concatenate 'string "/" *clath-app-address* *login-extension* "/"))
 
 
 ;;FIXME: :username and :display-name extraction are getting really messy.
